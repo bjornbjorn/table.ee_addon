@@ -1,19 +1,5 @@
 $(document).ready(function(e) {
 
-    var table_width = 600;
-    var cell_width = 200;
-    var cell_height = 100;
-    var num_cols = 3;
-    var num_rows = 3;
-    var row_positions = [0];
-    var col_positions = [];
-
-    var dragging = false;       // is currently dragging? true/false
-    var drag_row = false;       // row number being dragged
-    var drag_col = false;       // col number being dragged
-    var last_drag_x = false;    // last X position used for row when dragging
-    var last_drag_y = false;    // last Y position used for col when dragging
-
     /**
      * Find the closest number in an array to the number provided
      *
@@ -208,6 +194,23 @@ $(document).ready(function(e) {
 
 
 
+    var the_table = $.getTable();
+
+    var cell_width = 200;
+    var cell_height = 100;
+    var num_cols = the_table.data('init-num-cols');
+    var num_rows = the_table.data('init-num-rows');
+    var row_positions = [0];
+    var col_positions = [];
+
+    var dragging = false;       // is currently dragging? true/false
+    var drag_row = false;       // row number being dragged
+    var drag_col = false;       // col number being dragged
+    var last_drag_x = false;    // last X position used for row when dragging
+    var last_drag_y = false;    // last Y position used for col when dragging
+
+
+
 
 
 
@@ -267,7 +270,7 @@ $(document).ready(function(e) {
 
         for(var i=0; i < num_cols; i++ ) {
             the_table.append(
-                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea name="table_cell_'+field_id+'['+new_row_num+']['+(i+1)+']"></textarea></div>'
+                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
             );
         }
 
@@ -293,7 +296,7 @@ $(document).ready(function(e) {
         $.addColDragger(new_col_num);
         for(var i=0; i < num_rows; i++) {
             the_table.append(
-                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea name="table_cell_'+field_id+'['+(i+1)+']['+new_col_num+']"></textarea></div>'
+                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea></textarea></div>'
             );
         }
 

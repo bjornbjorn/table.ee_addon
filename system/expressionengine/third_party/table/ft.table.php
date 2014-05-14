@@ -29,9 +29,42 @@ class Table_ft extends EE_Fieldtype {
      */
     public function display_field($data)
     {
+        ee()->load->library('table_lib');
+
         $vars = array(
             'field_id' => $this->field_id,
+            'table_rows' => FALSE,
+            'table_num_rows' => 0,
+            'table_num_cols' => 0,
         );
+
+        $entry_id = $this->content_id();
+        if($entry_id > 0) {
+            // entry is saved so we look up the saved data
+
+            $field_name = ee()->table_lib->get_field_name($this->field_id);
+
+            $q = ee()->db->where('entry_id', $entry_id)->order_by('row')->get(Table_ft::TABLE_PREFIX.$field_name);
+
+            $table_rows = $q->result_array();
+            $table_num_rows = $q->num_rows();
+            $table_num_cols = 0;
+
+            // count columns
+            if($table_num_rows > 0) {
+                $col_id = 1;
+                while(isset($table_rows[1]['col_'.$col_id])) {
+                    $table_num_cols++;
+                    $col_id++;
+                }
+            }
+
+            $vars['table_rows'] = $table_rows;
+            $vars['table_num_rows'] = $table_num_rows;
+            $vars['table_num_cols'] = $table_num_cols;
+        }
+
+
         ee()->load->library('table_lib');
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
@@ -118,18 +151,15 @@ class Table_ft extends EE_Fieldtype {
     public function post_save($data)
     {
         $field_id = $this->id();
-
+        ee()->load->library('table_lib');
 
         // $field_name = $this->name(); <- lol here $this->name() contains 'field_id_5' instead of field short name (which you will get while saving field)
 
         // find field short name
-        $q = ee()->db
-            ->where('site_id', ee()->config->item('site_id'))
-            ->where('field_id', $field_id)
-            ->get('channel_fields');
-        if($q->num_rows() > 0) {
 
-            $field_name = $q->row('field_name');
+        $field_name = ee()->table_name->get_field_name($field_id);
+
+        if($field_name) {
 
             $table_data = ee()->input->post('table_cell_'.$field_id);
             $entry_id = $this->settings['entry_id'];

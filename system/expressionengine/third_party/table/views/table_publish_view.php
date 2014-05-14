@@ -7,47 +7,31 @@
 
 <div class="table__table__container">
 
-    <div id="table__table__<?php echo $field_id ?>" class="table__table" data-field_id="<?php echo $field_id?>">
+    <div id="table__table__<?php echo $field_id ?>" class="table__table" data-field_id="<?php echo $field_id?>" data-init-num-rows="<?php echo $table_num_rows?>" data-init-num-cols="<?php echo $table_num_cols?>">
         <input type="hidden" name="field_id_<?php echo $field_id?>">
         <div class="table__table__header"></div>
         <div class="table__table__left__bar"></div>
 
-        <div data-row="1" data-col="1" class="table__cell">
-            <textarea name="table_cell_<?php echo $field_id?>[1][1]"></textarea>
-        </div>
+        <?php
+        if($table_rows) {
+            $row_num = 1;
+            foreach($table_rows as $table_row) {
+                $col_num = 1;
+                while(isset($table_row['col_'.$col_num])) {
+                    $cell_value = $table_row['col_'.$col_num];
 
-        <div data-row="1" data-col="2" class="table__cell">
-            <textarea name="table_cell_<?php echo $field_id?>[1][2]"></textarea>
-        </div>
+                    ?>
+                    <div data-row="<?php echo $row_num?>" data-col="<?php echo $col_num?>" class="table__cell">
+                        <textarea name="table_cell_<?php echo $field_id?>[<?php echo $row_num?>][<?php echo $col_num?>]"><?php echo $cell_value?></textarea>
+                    </div>
+                    <?php
+                    $col_num++;
+                }
 
-        <div data-row="1" data-col="3" class="table__cell">
-            <textarea name="table_cell_<?php echo $field_id?>[1][3]"></textarea>
-        </div>
-
-        <div data-row="2" data-col="1" class="table__cell">
-            <textarea name="table_cell_<?php echo $field_id?>[2][1]"></textarea>
-        </div>
-
-        <div data-row="2" data-col="2" class="table__cell">
-            <textarea name="table_cell_<?php echo $field_id?>[2][2]"></textarea>
-        </div>
-
-        <div data-row="2" data-col="3" class="table__cell">
-            <textarea></textarea>
-        </div>
-
-        <div data-row="3" data-col="1" class="table__cell">
-            <textarea></textarea>
-        </div>
-
-        <div data-row="3" data-col="2" class="table__cell">
-            <textarea></textarea>
-        </div>
-
-        <div data-row="3" data-col="3" class="table__cell">
-            <textarea></textarea>
-        </div>
-
+                $row_num++;
+            }
+        }
+        ?>
     </div>
 
 </div>
