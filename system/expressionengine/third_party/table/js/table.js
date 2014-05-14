@@ -47,6 +47,13 @@ $(document).ready(function(e) {
     };
 
     /**
+     * Get the current suggested table height (w/o header)
+     */
+    $.getTableHeight = function() {
+        return num_rows * cell_height;
+    };
+
+    /**
      * Update all table cells w/correct tabindex etc. - this is needed after
      * dragging around rows/cols and adding/removing rows/cols
      */
@@ -219,6 +226,7 @@ $(document).ready(function(e) {
      * initial positions.
      *
      */
+    the_table.height($.getTableHeight());
 
     var x = 0;
     var y = 0;
@@ -245,7 +253,7 @@ $(document).ready(function(e) {
         x++;
     });
 
-    $.getTableLeftBar().css('height', ($.getTable().height() + 20) + 'px' );
+    $.getTableLeftBar().css('height', ((num_rows*cell_height) + 20) + 'px' );
 
 
 
@@ -262,7 +270,7 @@ $(document).ready(function(e) {
         var the_table = $.getTable();
         var field_id = the_table.data('field_id');
 
-        the_table.css('height', $('.table__table').height() + cell_height);
+        the_table.css('height', $.getTableHeight() + cell_height);
         var new_row_num = num_rows+1;
         var new_row_position = (num_rows*cell_height);
 
@@ -277,7 +285,7 @@ $(document).ready(function(e) {
         row_positions.push(new_row_position);
         num_rows++;
 
-        $.getTableLeftBar().css('height', (the_table.height() + 20) + 'px' );
+        $.getTableLeftBar().css('height', ($.getTableHeight() + 20) + 'px' );
 
         $.updateTableCells();
     });
@@ -334,7 +342,7 @@ $(document).ready(function(e) {
                 $.updateTableRow(i+1, -1);
             }
 
-            $.getTableLeftBar().css('height', (the_table.height() + 20) + 'px' );
+            $.getTableLeftBar().css('height', ($.getTableHeight() + 20) + 'px' );
 
             $.updateTableCells();
 

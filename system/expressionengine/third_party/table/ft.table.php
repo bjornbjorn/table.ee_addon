@@ -157,7 +157,7 @@ class Table_ft extends EE_Fieldtype {
 
         // find field short name
 
-        $field_name = ee()->table_name->get_field_name($field_id);
+        $field_name = ee()->table_lib->get_field_name($field_id);
 
         if($field_name) {
 
