@@ -1,0 +1,127 @@
+@import "icons";
+
+/* apply a natural box layout model to all elements */
+*, *:before, *:after {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+
+/**
+ * Add row / col buttons
+ */
+a.table__table__add-row,
+a.table__table__add-row:hover,
+a.table__table__add-row:link,
+a.table__table__add-row:visited,
+a.table__table__add-col,
+a.table__table__add-col:hover,
+a.table__table__add-col:link,
+a.table__table__add-col:visited {
+  font-size: 12px;
+  text-decoration: none;
+  display: inline-block;
+  margin: 10px 0 10px 0;
+  border-radius: 3px;
+  border: none;
+  padding: 5px 9px;
+  color: #5f6c74;
+  white-space: nowrap;
+  cursor: pointer;
+  background-color: #d0d9e1;
+
+  &:hover {
+    background-color: #e11842;
+    color: #fff;
+  }
+}
+
+
+
+.table__table__container {
+  width:100%;
+  max-width: 100%;
+  overflow-x: scroll;
+}
+
+.table__table {
+  background-color: #e3e3e3;
+  margin: 20px 0 0 20px;
+  position: relative;
+  height: 300px;
+}
+
+.table__cell {
+  background-color: #fff;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  user-select: none;
+  border: 1px solid #e3e3e3;
+  position:absolute;
+  width: 201px;
+  height: 101px;
+  overflow:hidden;
+  padding:0;
+}
+
+.transitions {
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+/**
+ * Class applied to element (row/col) while being dragged
+ */
+.table__dragging__element {
+  z-index:999;
+  opacity: 0.8;
+  border: 1px dotted;
+}
+
+.table__table__delete-row {
+  position:absolute;
+  left: -20px;
+  top:0;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.drag-row {
+  padding: 0px;
+  width:20px;
+  height:20px;
+  cursor: move;
+  position: absolute;
+  left: -20px;
+  top: 0px;
+}
+
+.drag-col {
+  padding-left:8px;
+  height: 20px;
+  width: 20px;
+  cursor:move;
+  position:absolute;
+  top: -20px;
+  left: 181px;
+}
+
+.table__table {
+  textarea {
+    border: none;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border-radius: 0px;
+    padding: 5px;
+
+    &:focus {
+      border-right: 2px solid #e3e3e3;
+      border-bottom: 2px solid #e3e3e3;
+    }
+
+  }
+
+  input[type=text] {
+    width: 100%;
+  }
+}
