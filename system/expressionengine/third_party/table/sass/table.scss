@@ -43,6 +43,30 @@ a.table__table__add-col:visited {
   overflow-x: scroll;
 }
 
+.table__table__header {
+  width: 100%;
+  position: absolute;
+  top: -20px;
+  left:0;
+  height: 20px;
+  background-color: #f5f6f5;
+  border-top: 1px solid #c9cfd4;
+  border-right: 1px solid #c9cfd4;
+  z-index: 1;
+}
+
+.table__table__left__bar {
+  width: 20px;
+  position: absolute;
+  background-color: #f5f6f5;
+  left:-20px;
+  top:-20px;
+  height: 100%;
+  border-top: 1px solid #c9cfd4;
+  border-left: 1px solid #c9cfd4;
+  z-index: 1;
+}
+
 .table__table {
   background-color: #e3e3e3;
   margin: 20px 0 0 20px;
@@ -79,30 +103,41 @@ a.table__table__add-col:visited {
 
 .table__table__delete-row {
   position:absolute;
-  left: -20px;
+  left: -16px;
   top:0;
   font-size: 16px;
   cursor: pointer;
+  z-index: 99;
+  color:#e3e3e3;
+
+  -webkit-transition: color 0.2s; /* For Safari 3.1 to 6.0 */
+  transition: color 0.2s;
+
+  &:hover {
+    color: #e11842;
+  }
 }
 
 .drag-row {
-  padding: 0px;
+  padding: 0 0 0 6px;
   width:20px;
   height:20px;
   cursor: move;
   position: absolute;
   left: -20px;
   top: 0px;
+  z-index:99;
 }
 
 .drag-col {
-  padding-left:8px;
+  padding:4px 0 0 8px;
   height: 20px;
   width: 20px;
   cursor:move;
   position:absolute;
   top: -20px;
   left: 181px;
+  z-index:99;
 }
 
 .table__table {

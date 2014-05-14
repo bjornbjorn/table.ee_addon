@@ -79,14 +79,129 @@ $(document).ready(function(e) {
     };
 
     /**
+     * Get the table
+     *
+     * @returns {*|jQuery|HTMLElement}
+     */
+    $.getTable = function() {
+        return $('.table__table');
+    };
+
+    $.getTableLeftBar = function() {
+        return $('.table__table__left__bar');
+    };
+
+    /**
+     * Get all table cells
+     *
+     * @returns {*|jQuery|HTMLElement}
+     */
+    $.getTableCells = function() {
+       return $('.table__table .table__cell');
+    };
+
+    /**
+     * Get column by column number
+     *
+     * @param col_num
+     */
+    $.getTableCol = function(col_num) {
+        return $('.table__table .table__cell[data-col='+col_num+']');
+    };
+
+    /**
+     * Get row by row number
+     *
+     * @param row_num
+     */
+    $.getTableRow = function(row_num) {
+       return $('.table__table .table__cell[data-row="'+(row_num)+'"]');
+    };
+
+    /**
+     * Get a specific row dragger by row number, or all row draggers if row_num not specified
+     *
+     * @param row_num (can be empty)
+     */
+    $.getTableRowDragger = function(row_num) {
+        if(row_num !== undefined) {
+            return $('.drag-row[data-row="'+row_num+'"]');
+        } else {
+            return $('.drag-row');
+        }
+    };
+
+    /**
+     * Get col dragger by column number, or all column draggers if col_num not specified
+     *
+     * @param col_num (can be empty)
+     */
+    $.getTableColDragger = function(col_num) {
+        if(col_num !== undefined) {
+            return $('.drag-col[data-col="'+col_num+'"]');
+        } else {
+            return $('.drag-col');
+        }
+    };
+
+
+    /**
+     * Get row delete link by row number
+     *
+     * @param row_num
+     */
+    $.getTableRowDeleteLink = function(row_num) {
+        if(row_num !== undefined) {
+            return $('.table__table__delete-row[data-row="'+row_num+'"]');
+        } else {
+            return $('.table__table__delete-row');
+        }
+    };
+
+
+    /**
+     * Will update a table row and it's action icons to the correct postion
+     * @param row_num
+     */
+    $.updateTableRow = function(row_num, move_index) {
+
+        var new_row_num = row_num;
+        var current_row = $.getTableRow(row_num);
+        var current_drag_row = $.getTableRowDragger(row_num);
+        var current_row_delete_link = $.getTableRowDeleteLink(row_num);
+
+        if(move_index !== undefined) {
+            new_row_num = row_num + move_index;
+            current_row.data('row', new_row_num);
+            current_row.attr('data-row', new_row_num);
+            current_drag_row.data('row', new_row_num);
+            current_drag_row.attr('data-row', new_row_num);
+            current_row_delete_link.data('row', new_row_num);
+            current_row_delete_link.attr('data-row', new_row_num);
+        }
+
+        var row_position = row_positions[new_row_num-1];
+        current_drag_row.css('top', row_position + 'px' );
+        current_row.css('top', row_position + 'px' );
+
+        console.log("delete-link="+current_row_delete_link);
+
+        current_row_delete_link.css('top', (row_position + (cell_height/2)-5) + 'px');
+    };
+
+
+    /**
      * Update row positions array
      */
     $.updateRowPositionsCache = function() {
         row_positions = [];
         for(var i=0; i < num_rows; i++) {
-            row_positions.push( i*cell_height );
+            var row_position = i*cell_height;
+            row_positions.push( row_position );
         }
     };
+
+
 
 
 
@@ -103,7 +218,7 @@ $(document).ready(function(e) {
 
     $.addRowDragger(1); // add for 1st
 
-    $('.table__table .table__cell').each(function(e) {
+    $.getTableCells().each(function(e) {
         if(x >= num_cols) {
             x = 0;
             y++;
@@ -133,14 +248,16 @@ $(document).ready(function(e) {
      */
     $('.table__table__add-row').on('click', function(e) {
         e.preventDefault();
-        $('.table__table').css('height', $('.table__table').height() + cell_height);
+
+        var the_table = $.getTable();
+        the_table.css('height', $('.table__table').height() + cell_height);
         var new_row_num = num_rows+1;
         var new_row_position = (num_rows*cell_height);
 
         $.addRowDragger(new_row_num);
 
         for(var i=0; i < num_cols; i++ ) {
-            $('.table__table').append(
+            the_table.append(
                 '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
             );
         }
@@ -157,13 +274,14 @@ $(document).ready(function(e) {
     $('.table__table__add-col').on('click', function(e) {
         e.preventDefault();
 
-        $('.table__table').css('width', $('.table__table').width() + cell_width);
+        var the_table = $.getTable();
+        the_table.css('width', $('.table__table').width() + cell_width);
         var new_col_num = num_cols+1;
         var new_col_position = (num_cols*cell_width);
 
         $.addColDragger(new_col_num);
         for(var i=0; i < num_rows; i++) {
-            $('.table__table').append(
+            the_table.append(
                 '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea></textarea></div>'
             );
         }
@@ -176,35 +294,53 @@ $(document).ready(function(e) {
 
 
     /**
-     * Delete row
+     * Delete row button click handler
      */
     $(document).on('click','.table__table__delete-row', function(e) {
         var row = $(this).data('row');
-        $('.table__table .table__cell[data-row="'+row+'"]').addClass('table__cell-pending-delete');
+        var the_table_row = $.getTableRow(row);
+        var the_table_row_dragger = $.getTableRowDragger(row);
+        var the_table_row_delete_link = $.getTableRowDeleteLink(row);
+        var the_table = $.getTable();
+
+        the_table_row.addClass('table__cell-pending-delete');
         if(confirm('Sure you want to delete the row?')) {
-            $('.table__table .table__cell[data-row="'+row+'"]').remove();
-            $('.drag-row[data-row="'+row+'"]').remove();
-            $('.table__table__delete-row[data-row="'+row+'"]').remove();
+
+            // remove the
+            the_table_row.remove();
+            the_table_row_dragger.remove();
+            the_table_row_delete_link.remove();
+
+            num_rows--;
+            the_table.css('height', cell_height*num_rows);
+            $.updateRowPositionsCache();
+
+            // move all rows below the deleted row one up
+            for(var i=row; i <= num_rows; i++) {
+                $.updateTableRow(i+1, -1);
+            }
+
+            $.updateTableCells();
+
+        } else {
+            the_table_row.removeClass('table__cell-pending-delete');
         }
-
-        $('.table__table .table__cell[data-row="'+row+'"]').removeClass('table__cell-pending-delete');
-
-        num_rows--;
-        $('.table__table').css('height', cell_height*num_rows);
-        $.updateRowPositionsCache();
     });
 
 
-    var start_x = 0;
-    var start_y = 0;
-
+    /**
+     * drag-row mouse handler
+     */
     $(document).on('mousedown', '.drag-row', function(e) {
         e.preventDefault();
         e.stopPropagation();
+
         $(this).addClass('active__dragging__link');
         var row = $(this).data('row');
-        var drag_element = $('.table__table .table__cell[data-row='+row+']');
+        var drag_element = $.getTableRow(row);
         drag_element.removeClass('transitions').addClass('table__dragging__element');
+
+        $.getTableRowDeleteLink().fadeOut();
 
         $('.drag-row').not('.active__dragging__link').fadeOut();
 
@@ -214,6 +350,10 @@ $(document).ready(function(e) {
         return false;
     });
 
+
+    /**
+     * drag-col mouse handler
+     */
     $(document).on('mousedown', '.drag-col', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -221,7 +361,9 @@ $(document).ready(function(e) {
         $(this).addClass('active__dragging__link');
 
         var col = $(this).data('col');
-        $('.table__table .table__cell[data-col='+col+']').removeClass('transitions').addClass('table__dragging__element');
+
+
+        $.getTableCol(col).removeClass('transitions').addClass('table__dragging__element');
 
         $('.drag-col').not('.active__dragging__link').fadeOut();
 
@@ -236,8 +378,11 @@ $(document).ready(function(e) {
         e.preventDefault();
 
         if(dragging) {
+
+            var the_table = $.getTable();
+
             if(drag_row) {
-                last_drag_y = e.pageY - $('.table__table').offset().top;
+                last_drag_y = e.pageY - the_table.offset().top;
 
                 var drag_link = $('.drag-row.active__dragging__link');
 
@@ -263,7 +408,7 @@ $(document).ready(function(e) {
                     var should_move_row = closest_row.position+1;
                     var should_move_row_to_y = closest_row.closest - cell_height;
 
-                    $('.table__table .table__cell[data-row='+(should_move_row)+']').each(function(e) {
+                    $.getTableRow(should_move_row).each(function(e) {
                         $(this).css('top', (should_move_row_to_y) + 'px');
                         $(this).attr('data-row', should_move_row-1);
                         $(this).data('row', should_move_row-1);
@@ -285,7 +430,7 @@ $(document).ready(function(e) {
                     var should_move_row_down = closest_row.position+1;
                     var should_move_row_down_to_y = should_move_row_down*cell_height;
 
-                    $('.table__table .table__cell[data-row='+(should_move_row_down)+']').each(function(e) {
+                    $.getTableRow(should_move_row_down).each(function(e) {
                         $(this).css('top', (should_move_row_down_to_y) + 'px');
                         $(this).attr('data-row', should_move_row_down+1);
                         $(this).data('row', should_move_row_down+1);
@@ -305,7 +450,7 @@ $(document).ready(function(e) {
 
             } else if(drag_col) {
 
-                last_drag_x = e.pageX - $('.table__table').offset().left - cell_width;
+                last_drag_x = e.pageX - the_table.offset().left - cell_width;
 
                 var drag_col_link = $('.drag-col.active__dragging__link');
 
@@ -333,7 +478,7 @@ $(document).ready(function(e) {
                     /**
                      * Move the col we are over left
                      */
-                    $('.table__table .table__cell[data-col='+(new_col_index)+']').each(function(e) {
+                    $.getTableCol(new_col_index).each(function(e) {
                         $(this).css('left', (should_move_over_col_to_x) + 'px');
                         $(this).attr('data-col', new_col_index-1);
                         $(this).data('col', new_col_index-1);
@@ -354,7 +499,7 @@ $(document).ready(function(e) {
                     /**
                      * Move the col we are over right
                      */
-                    $('.table__table .table__cell[data-col='+(new_col_index)+']').each(function(e) {
+                    $.getTableCol(new_col_index).each(function(e) {
                         $(this).css('left', (should_move_over_col_right_to) + 'px');
                         $(this).attr('data-col', new_col_index+1);
                         $(this).data('col', new_col_index+1);
@@ -382,6 +527,8 @@ $(document).ready(function(e) {
 
         if(drag_row) {  // we were dragging a row, so find the closest spot for it
 
+            $.getTableRowDeleteLink().fadeIn();
+
             var closest_row = $.closest(last_drag_y, row_positions);
             var row_y = closest_row.closest;
             $('.table__dragging__element').css('top', row_y+'px');
@@ -390,7 +537,7 @@ $(document).ready(function(e) {
              * Go through all drag rows and position them correctly + set data-row based on position in HTML
              */
             var row_counter = 1;
-            $('.drag-row').each(function(e) {
+            $.getTableRowDragger().each(function(e) {
                 $(this).css('top', ((row_counter-1) * cell_height) + 'px' );
                 $(this).attr('data-row', row_counter);
                 $(this).data('row', row_counter);
@@ -407,7 +554,7 @@ $(document).ready(function(e) {
             $('.table__dragging__element').css('left', row_x+'px');
 
             var col_counter = 1;
-            $('.drag-col').each(function(e) {
+            $.getTableColDragger().each(function(e) {
                 $(this).css('left', ((col_counter * cell_width)-19) + 'px' );
                 $(this).attr('data-col', col_counter);
                 $(this).data('col', col_counter);
@@ -418,7 +565,7 @@ $(document).ready(function(e) {
 
         }
 
-        $('.table__cell').removeClass('table__dragging__element').addClass('transitions');
+        $.getTableCells().removeClass('table__dragging__element').addClass('transitions');
 
         $.updateTableCells();
 

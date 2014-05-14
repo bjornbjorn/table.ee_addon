@@ -9,6 +9,9 @@
 
     <div class="table__table">
 
+        <div class="table__table__header"></div>
+        <div class="table__table__left__bar"></div>
+
         <div data-row="1" data-col="1" class="table__cell">
             <textarea></textarea>
         </div>
