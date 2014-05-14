@@ -66,6 +66,8 @@ $(document).ready(function(e) {
      */
     $.updateTableCells = function() {
 
+        var field_id = $.getTable().data('field_id');
+
         /**
          * Update table cell tabs indexes
          */
@@ -73,7 +75,11 @@ $(document).ready(function(e) {
         for(var row=1; row < (num_rows+1); row++) {
             for(var col=1; col < (num_cols+1); col++) {
                 tabindex++;
-                $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"] :first-child').attr('tabindex', tabindex);
+                var current_cell_first_child =  $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"] :first-child');
+
+                // set tabindex
+                current_cell_first_child.attr('tabindex', tabindex);
+                current_cell_first_child.attr('name', 'table_cell_'+field_id+'['+row+']['+col+']');
             }
         }
     };
@@ -184,8 +190,6 @@ $(document).ready(function(e) {
         current_drag_row.css('top', row_position + 'px' );
         current_row.css('top', row_position + 'px' );
 
-        console.log("delete-link="+current_row_delete_link);
-
         current_row_delete_link.css('top', (row_position + (cell_height/2)-5) + 'px');
     };
 
@@ -238,6 +242,9 @@ $(document).ready(function(e) {
         x++;
     });
 
+    $.getTableLeftBar().css('height', ($.getTable().height() + 20) + 'px' );
+
+
 
     // add transitions class after we have positioned them
     setTimeout($.addTransitionsClass, 500);
@@ -250,6 +257,8 @@ $(document).ready(function(e) {
         e.preventDefault();
 
         var the_table = $.getTable();
+        var field_id = the_table.data('field_id');
+
         the_table.css('height', $('.table__table').height() + cell_height);
         var new_row_num = num_rows+1;
         var new_row_position = (num_rows*cell_height);
@@ -258,12 +267,14 @@ $(document).ready(function(e) {
 
         for(var i=0; i < num_cols; i++ ) {
             the_table.append(
-                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
+                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea name="table_cell_'+field_id+'['+new_row_num+']['+(i+1)+']"></textarea></div>'
             );
         }
 
         row_positions.push(new_row_position);
         num_rows++;
+
+        $.getTableLeftBar().css('height', (the_table.height() + 20) + 'px' );
 
         $.updateTableCells();
     });
@@ -282,7 +293,7 @@ $(document).ready(function(e) {
         $.addColDragger(new_col_num);
         for(var i=0; i < num_rows; i++) {
             the_table.append(
-                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea></textarea></div>'
+                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea name="table_cell_'+field_id+'['+(i+1)+']['+new_col_num+']"></textarea></div>'
             );
         }
 
@@ -319,6 +330,8 @@ $(document).ready(function(e) {
             for(var i=row; i <= num_rows; i++) {
                 $.updateTableRow(i+1, -1);
             }
+
+            $.getTableLeftBar().css('height', (the_table.height() + 20) + 'px' );
 
             $.updateTableCells();
 

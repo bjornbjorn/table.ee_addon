@@ -12,13 +12,21 @@ class Table_ft extends EE_Fieldtype {
         'version'	=> '1.0'
     );
 
-    var $has_array_data = TRUE;
+    public $has_array_data = TRUE;
+
+    const TABLE_PREFIX = 'table_';
 
     public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * Display the field
+     *
+     * @param $data
+     * @return string
+     */
     public function display_field($data)
     {
         $vars = array(
@@ -30,5 +38,262 @@ class Table_ft extends EE_Fieldtype {
         ee()->cp->add_to_head('<script type="text/javascript" src="'.ee()->table_lib->get_theme_url().'js/table.min.js'.'"></script>');
         return ee()->load->view('table_publish_view', $vars, TRUE);
     }
+
+
+    /**
+     * Called TWICE when a field is edited. We use this to rename the field table
+     * if the field is renamed
+     *
+     * @param $data
+     * @return array|void
+     */
+    public function settings_modify_column($data)
+    {
+        $field_name = ee()->input->post('field_name');
+        $old_field_name = $data['field_name'];
+        $table_name = Table_ft::TABLE_PREFIX.$field_name;
+
+        /**
+         * If the field was renamed, rename the table
+         */
+        $old_table_name = Table_ft::TABLE_PREFIX.$old_field_name;
+        if(ee()->db->table_exists($old_table_name)) {
+            ee()->load->dbforge();
+            ee()->dbforge->rename_table($old_table_name, $table_name);
+        }
+    }
+
+
+    public function post_save_settings($data)
+    {
+        /**
+         * Create the table for this field if it does not exist.
+         */
+        $field_name = $data['field_name'];
+        $table_name = Table_ft::TABLE_PREFIX.$field_name;
+
+        /**
+         * hack to flush the cache of table names or else we will get SQL when renaming a field. This might stop
+         * working in future versions of EE if the data_cache array is made private. But ->cache_off() does not work
+         * so will have to do for now ..
+         * @todo fix
+         */
+        ee()->db->data_cache = array();
+        if(!ee()->db->table_exists($table_name))
+        {
+            ee()->load->dbforge();
+
+            $id_field_name = Table_ft::TABLE_PREFIX.$field_name.'_id';
+            $table_fields = array(
+                $id_field_name => array(
+                    'type' => 'int',
+                    'constraint' => '10',
+                    'unsigned' => TRUE,
+                    'auto_increment' => TRUE),
+
+                'entry_id' => array(
+                    'type' => 'int',
+                    'constraint' => '10',
+                    'null' => FALSE),
+
+                'row' => array(
+                    'type' => 'int',
+                    'constraint' => '10',
+                    'null' => FALSE),
+            );
+
+            $this->EE->dbforge->add_field($table_fields);
+            $this->EE->dbforge->add_key($id_field_name, TRUE);
+            $this->EE->dbforge->create_table($table_name);
+        }
+    }
+
+
+    /**
+     * Save the data entered by the user
+     *
+     * @param $data
+     * @return string|void
+     */
+    public function post_save($data)
+    {
+        $field_id = $this->id();
+
+
+        // $field_name = $this->name(); <- lol here $this->name() contains 'field_id_5' instead of field short name (which you will get while saving field)
+
+        // find field short name
+        $q = ee()->db
+            ->where('site_id', ee()->config->item('site_id'))
+            ->where('field_id', $field_id)
+            ->get('channel_fields');
+        if($q->num_rows() > 0) {
+
+            $field_name = $q->row('field_name');
+
+            $table_data = ee()->input->post('table_cell_'.$field_id);
+            $entry_id = $this->settings['entry_id'];
+
+            $table_name = Table_ft::TABLE_PREFIX.$field_name;
+            // empty table
+            ee()->db->query('DELETE FROM '.ee()->db->dbprefix($table_name));
+
+            if(isset($table_data[1])) { // we have table data
+                $num_cols = count($table_data[1]);
+
+                /**
+                 * hack to flush the cache of table names - not sure if it is needed here but doing it anyway
+                 *
+                 * @todo fix
+                 */
+                ee()->db->data_cache = array();
+
+                $add_fields = array();
+                for($i=1; $i <= $num_cols; $i++) {
+                    if(!ee()->db->field_exists('col_'.$i, $table_name)) {
+                        $add_fields['col_'.$i] = array(
+                                'type' => 'TEXT',
+                                'null' => TRUE
+                        );
+                    }
+                }
+
+                if(count($add_fields) > 0) {
+                    ee()->load->dbforge();
+                    ee()->dbforge->add_column($table_name, $add_fields);
+                }
+
+                for($j=1; $j <= count($table_data); $j++) {
+
+                    $insert_data = array(
+                        'entry_id' => $entry_id,
+                        'row' => $j,
+                    );
+
+                    $col_data = $table_data[$j];
+                    for($c = 1; $c <= count($col_data); $c++) {
+                        $insert_data['col_'.$c] = $col_data[$c];
+                    }
+
+                    ee()->db->insert($table_name, $insert_data);
+                }
+            }
+        }
+    }
+
+
+
+    // --------------------------------------------------------------------
+
+   /* public function display_settings($data)
+    {
+        $field_id = (int) $this->id();
+
+        ee()->table->set_heading(array(
+            'data' => lang('table_options'),
+            'colspan' => 2
+        ));
+
+        // Minimum rows field
+        ee()->table->add_row(
+            form_input(array(
+                'name' => 'table_default_rows',
+                'id' => 'table_default_rows',
+                'value' => set_value('table_default_rows', (isset($data['table_default_rows'])) ? $data['table_default_rows'] : 0),
+                'class' => 'grid_input_text_small'
+            )).
+            '<div class="grid_input_label_group">'.
+            form_label(lang('table_default_rows'), 'table_default_rows').
+            '<br><i class="instruction_text">'.lang('table_default_rows_desc').'</i></div>'.
+            '<div class="grid_validation_error">'.form_error('table_default_rows').'</div>'
+        );
+
+        // Maximum rows field
+        ee()->table->add_row(
+            form_input(array(
+                'name' => 'grid_max_rows',
+                'id' => 'grid_max_rows',
+                'value' => set_value('grid_max_rows', (isset($data['grid_max_rows'])) ? $data['grid_max_rows'] : ''),
+                'class' => 'grid_input_text_small'
+            )).
+            '<div class="grid_input_label_group">'.
+            form_label(lang('grid_max_rows'), 'grid_max_rows').
+            '<br><i class="instruction_text">'.lang('grid_max_rows_desc').'</i></div>'.
+            '<div class="grid_validation_error">'.form_error('grid_max_rows').'</div>'
+        );
+
+        // Settings header
+        $settings_html = form_label(lang('grid_config')).'<br>'.
+            '<i class="instruction_text">'.lang('grid_config_desc').'</i>';
+
+        // Settings to initialize JS with
+        $settings = array();
+
+        // If we're coming from a form validation error, load the previous
+        // screen's HTML for the Grid field for easy repopulation
+        if ($grid_html = ee()->input->post('grid_html'))
+        {
+            $settings_html .= form_error('grid_validation');
+            $settings_html .= $grid_html;
+
+            // Array of field names that had validation errors, we'll highlight them
+            if ($error_fields = ee()->session->cache(__CLASS__, 'grid_settings_field_errors'))
+            {
+                $settings['error_fields'] = $error_fields;
+            }
+        }
+        // Otherwise load settings from the database
+        else
+        {
+            $this->_load_grid_lib();
+
+            $vars = array();
+
+            // Fresh settings forms ready to be used for added columns
+            $vars['settings_forms'] = array();
+            foreach (ee()->grid_lib->get_grid_fieldtypes() as $field_name => $data)
+            {
+                $vars['settings_forms'][$field_name] = ee()->grid_lib->get_settings_form($field_name);
+            }
+
+            // Gather columns for current field
+            $vars['columns'] = array();
+
+            if ( ! empty($field_id))
+            {
+                $columns = ee()->grid_model->get_columns_for_field($field_id, $this->content_type());
+
+                foreach ($columns as $column)
+                {
+                    $vars['columns'][] = ee()->grid_lib->get_column_view($column);
+                }
+            }
+
+            // Will be our template for newly-created columns
+            $vars['blank_col'] = ee()->grid_lib->get_column_view();
+
+            if (empty($vars['columns']))
+            {
+                $vars['columns'][] = $vars['blank_col'];
+            }
+
+            $settings_html .= ee()->load->view('settings', $vars, TRUE);
+        }
+
+        // The big column configuration row, generated from the settings view
+        ee()->table->add_row($settings_html);
+
+        ee()->cp->add_to_head(ee()->view->head_link('css/grid.css'));
+
+        ee()->cp->add_js_script('plugin', 'ee_url_title');
+        ee()->cp->add_js_script('ui', 'sortable');
+        ee()->cp->add_js_script('file', 'cp/sort_helper');
+        ee()->cp->add_js_script('file', 'cp/grid');
+
+        ee()->javascript->output('EE.grid_settings('.json_encode($settings).');');
+
+        return ee()->table->generate();
+    }
+   */
 
 }
