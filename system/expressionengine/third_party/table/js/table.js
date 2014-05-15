@@ -348,10 +348,25 @@ $(document).ready(function(e) {
 
 
     /**
+     * Global click handler
+     */
+    $(document).on('click', function(e) {
+
+        /**
+         * If the add row dropdown is displaying hide it
+         */
+        if($('.table__table__add-row-dropdown').is(':visible')) {
+            $('.table__table__add-row-dropdown').hide();
+        }
+    });
+
+
+    /**
      * Add row button click handler
      */
     $('.table__table__add-row').on('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
         if($('.table__table__add-row-dropdown').is(':visible')) {
             $('.table__table__add-row-dropdown').hide();
@@ -363,7 +378,7 @@ $(document).ready(function(e) {
 
     $('.table__table__add-text-row').on('click', function(e) {
         e.preventDefault();
-
+        e.stopPropagation();
         $('.table__table__add-row-dropdown').hide();
 
         $.addTableTextRow();

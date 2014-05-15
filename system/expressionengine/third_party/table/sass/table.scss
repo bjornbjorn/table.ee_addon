@@ -54,6 +54,7 @@ a.table__table__add-col:visited {
   @include arrow(top, 'left', #d0d9e1);
   z-index: 9999;
   padding: 10px;
+  //@include vendor('box-shadow', #c9cfd4 1px 1px 0);   // did not look much better...
   display: none;
 }
 
