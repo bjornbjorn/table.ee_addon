@@ -258,11 +258,38 @@ $(document).ready(function(e) {
         }
     };
 
+    /**
+     * Get HTML for a text cell
+     *
+     * @param row_num
+     * @param col_num
+     * @returns {string}
+     */
+    $.getNewTextCellContent = function(row_num, col_num) {
+        return '<textarea></textarea>';
+    };
+
+    /**
+     * Get HTML for a title image cell
+     *
+     * @param row_num
+     * @param col_num
+     * @returns {string}
+     */
+    $.getNewTitleImageCellContent = function(row_num, col_num) {
+        return '<input type="text"><div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
+    };
+
 
     /**
      * Add a standard Text row to the table
      */
-    $.addTableTextRow = function() {
+    $.addNewTableRow = function(row_type) {
+
+        if(row_type === undefined) {
+            row_type = 'text';
+        }
+
         var the_table = $.getTable();
         var field_id = the_table.data('field_id');
 
@@ -272,9 +299,29 @@ $(document).ready(function(e) {
 
         $.addRowActions(new_row_num);
 
+        /**
+         * If we are adding the first row, and we don't have any cols yet, add a single col
+         */
+        if(num_cols === 0) {
+            num_cols = 1;
+            $.addColActions(1);
+            col_positions = [0];
+        }
+
         for(var i=0; i < num_cols; i++ ) {
+            var new_col_num = i+1;
+            var cell_content = '';
+            switch(row_type) {
+                case 'title_image':
+                    cell_content = $.getNewTitleImageCellContent(new_row_num, new_col_num);
+                    break;
+                case 'text':
+                    cell_content = $.getNewTextCellContent(new_row_num, new_col_num);
+                    break;
+            }
+
             the_table.append(
-                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
+                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row-type="'+row_type+'" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
             );
         }
 
@@ -285,6 +332,7 @@ $(document).ready(function(e) {
 
         $.updateTableCells();
     };
+
 
 
     var the_table = $.getTable();
@@ -381,7 +429,46 @@ $(document).ready(function(e) {
         e.stopPropagation();
         $('.table__table__add-row-dropdown').hide();
 
-        $.addTableTextRow();
+        $.addNewTableRow();
+    });
+
+    $('.table__table__add-title-image-row').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.table__table__add-row-dropdown').hide();
+
+        $.addNewTableRow('title_image');
+    });
+
+    $(document).on('click', '.table__table__cell__add-image-button', function(e) {
+        e.preventDefault();
+
+        var add_image_controls_div = $(this).parent();
+        var remove_image_controls_div = $(this).parent().next();
+
+        var assets_sheet = new Assets.Sheet({
+
+            // optional settings (these are the default values):
+            multiSelect: false,
+            filedirs:    'all', // or array of filedir IDs
+            kinds:       ['image'], // or array of file kinds ("image", "flash", etc)
+
+            // onSelect callback (required):
+            onSelect:    function(files) {
+
+                if(files.length > 0) {
+                    add_image_controls_div.hide();
+
+
+                    var file_id = files[0].id;
+                    var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=200x200&hash='+Math.random();
+                    remove_image_controls_div.prepend('<img src="'+thumb_url+'"/>');
+                    remove_image_controls_div.fadeIn();
+                }
+            }
+        });
+
+        assets_sheet.show();
     });
 
 
@@ -392,6 +479,11 @@ $(document).ready(function(e) {
     $('.table__table__add-col').on('click', function(e) {
         e.preventDefault();
 
+        if(num_rows === 0) {
+            alert("Add a row first");
+            return;
+        }
+
         $('.table__table__add-row-dropdown').hide();    // just in case it is showing
 
         var the_table = $.getTable();
@@ -401,8 +493,21 @@ $(document).ready(function(e) {
 
         $.addColActions(new_col_num);
         for(var i=0; i < num_rows; i++) {
+            var new_row_num = i+1;
+
+            // find the row type based on the first column
+            var row_type = $('.table__table .table__cell[data-row="'+new_row_num+'"][data-col=1]').data('row-type');
+            var cell_content = '';
+            switch(row_type) {
+                case 'title_image':
+                    cell_content = $.getNewTitleImageCellContent(new_row_num, new_col_num);
+                    break;
+                case 'text':
+                    cell_content = $.getNewTextCellContent(new_row_num, new_col_num);
+                    break;
+            }
             the_table.append(
-                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea></textarea></div>'
+                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
             );
         }
 

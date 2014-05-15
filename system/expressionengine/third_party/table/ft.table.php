@@ -65,6 +65,15 @@ class Table_ft extends EE_Fieldtype {
         }
 
 
+        // Make sure that Assets is installed
+        if (array_key_exists('assets', $this->EE->addons->get_installed()))
+        {
+            require_once PATH_THIRD.'assets/helper.php';
+
+            $assets_helper = new Assets_helper;
+            $assets_helper->include_sheet_resources();
+        }
+
         ee()->load->library('table_lib');
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
