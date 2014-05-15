@@ -53,7 +53,7 @@ class Table_ft extends EE_Fieldtype {
             // count columns
             if($table_num_rows > 0) {
                 $col_id = 1;
-                while(isset($table_rows[1]['col_'.$col_id])) {
+                while(isset($table_rows[0]['col_'.$col_id])) {
                     $table_num_cols++;
                     $col_id++;
                 }
@@ -165,8 +165,8 @@ class Table_ft extends EE_Fieldtype {
             $entry_id = $this->settings['entry_id'];
 
             $table_name = Table_ft::TABLE_PREFIX.$field_name;
-            // empty table
-            ee()->db->query('DELETE FROM '.ee()->db->dbprefix($table_name));
+            // delete all rows for this entry_od
+            ee()->db->where('entry_id', $entry_id)->delete($table_name);
 
             if(isset($table_data[1])) { // we have table data
                 $num_cols = count($table_data[1]);
@@ -211,6 +211,25 @@ class Table_ft extends EE_Fieldtype {
         }
     }
 
+
+    /**
+     * This function is called when an entry is deleted
+     *
+     * @param $entry_ids
+     *
+     */
+    public function delete($entry_ids)
+    {
+        $field_id = $this->id();
+        ee()->load->library('table_lib');
+
+        // find field short name
+        $field_name = ee()->table_lib->get_field_name($field_id);
+        if($field_name) {
+            $table_name = Table_ft::TABLE_PREFIX.$field_name;
+            ee()->db->where_in('entry_id', $entry_ids)->delete($table_name);
+        }
+    }
 
 
     // --------------------------------------------------------------------
