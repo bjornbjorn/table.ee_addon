@@ -452,7 +452,11 @@ $(document).ready(function(e) {
 
         $.getTableRowDeleteLink().fadeOut();
 
-        $('.drag-row').not('.active__dragging__link').fadeOut();
+        $('.drag-row').not('.active__dragging__link').fadeOut(400, function(e) {
+            if(!dragging) {
+                $(this).show(); // if dragging completed before the fadeout completes then we need to show() it again here since the .show() in the mouseup event won't do its job as it is called before fadeOut() completes.
+            }
+        });
 
         dragging = true;
         drag_row = row;
@@ -476,7 +480,11 @@ $(document).ready(function(e) {
 
         $.getTableCol(col).removeClass('transitions').addClass('table__dragging__element');
 
-        $('.drag-col').not('.active__dragging__link').fadeOut();
+        $('.drag-col').not('.active__dragging__link').fadeOut(400, function(e) {
+            if(!dragging) {
+                $(this).show(); // if dragging completed before the fadeout completes then we need to show() it again here since the .show() in the mouseup event won't do its job as it is called before fadeOut() completes.
+            }
+        });
 
         dragging = true;
         drag_col = col;
@@ -671,6 +679,8 @@ $(document).ready(function(e) {
                 $(this).css('left', ((col_counter * cell_width)-19) + 'px' );
                 $(this).attr('data-col', col_counter);
                 $(this).data('col', col_counter);
+
+                console.log("showing col " + col_counter);
                 col_counter++;
 
                 $(this).show();
