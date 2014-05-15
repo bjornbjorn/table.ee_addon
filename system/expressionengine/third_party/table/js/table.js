@@ -22,10 +22,10 @@ $(document).ready(function(e) {
     };
 
     /**
-     * Add a row reoder "flip" to the table
+     * Add a row reoder "flip" to the table + delete icon
      * @param row
      */
-    $.addRowDragger = function(row_num) {
+    $.addRowActions = function(row_num) {
         $('.table__table').append('<div class="drag-row icon-reorder" style="top:'+((row_num-1) * cell_height)+'px" data-row="'+row_num+'"></div>');
         $('.table__table').append('<div class="table__table__delete-row icon-remove-circle" style="top: '+((row_num*cell_height)-(cell_height/2)-5)+'px" data-row="'+row_num+'"></div>');
     };
@@ -34,8 +34,9 @@ $(document).ready(function(e) {
      * Add a column reoder "flip" to the table
      * @param col_num
      */
-    $.addColDragger = function(col_num) {
+    $.addColActions = function(col_num) {
         $('.table__table').append('<div class="drag-col icon-reorder" style="left:'+((col_num*cell_width)-19)+'px" data-col="'+col_num+'"></div>');
+        $('.table__table').append('<div class="table__table__delete-col icon-remove-circle" style="left: ' + (((col_num*cell_width) - (cell_width/2) - 8 )  +'px" data-col="'+col_num+'"></div>'));
     };
 
 
@@ -145,9 +146,10 @@ $(document).ready(function(e) {
 
 
     /**
-     * Get row delete link by row number
+     * Get row delete link by row number, or all if row number not defined
      *
      * @param row_num
+     * @returns {*|jQuery|HTMLElement}
      */
     $.getTableRowDeleteLink = function(row_num) {
         if(row_num !== undefined) {
@@ -157,10 +159,25 @@ $(document).ready(function(e) {
         }
     };
 
+    /**
+     * Get col delete link by col number, or all if col number not defined
+     *
+     * @param col_num
+     * @returns {*|jQuery|HTMLElement}
+     */
+    $.getTableColDeleteLink = function(col_num) {
+        if(col_num !== undefined) {
+            return $('.table__table__delete-col[data-col="'+col_num+'"]');
+        } else {
+            return $('.table__table__delete-col');
+        }
+    };
+
 
     /**
-     * Will update a table row and it's action icons to the correct postion
-     * @param row_num
+     * Will update a table row and its action icons to the correct postions
+     * @param row_num the row number
+     * @param move_index change the row number of this row (ie. -1 will move the row one up)
      */
     $.updateTableRow = function(row_num, move_index) {
 
@@ -188,6 +205,37 @@ $(document).ready(function(e) {
 
 
     /**
+     * Will update a table column and its action icons to the correct positions
+     *
+     * @param col_num the column number
+     * @param move_index change the col number of this column (ie. -1 will move the col to the left)
+     */
+    $.updateTableCol = function(col_num, move_index) {
+
+        var new_col_num = col_num;
+        var current_col = $.getTableCol(col_num);
+        var current_drag_col = $.getTableColDragger(col_num);
+        var current_col_delete_link = $.getTableColDeleteLink(col_num);
+
+        if(move_index !== undefined) {
+            new_col_num = col_num + move_index;
+            current_col.data('col', new_col_num);
+            current_col.attr('data-col', new_col_num);
+            current_drag_col.data('col', new_col_num);
+            current_drag_col.attr('data-col', new_col_num);
+            current_col_delete_link.data('col', new_col_num);
+            current_col_delete_link.attr('data-col', new_col_num);
+        }
+
+        var col_position = col_positions[new_col_num-1];
+        current_col.css('left', col_position + 'px');
+        current_drag_col.css('left', (col_position - 19) + 'px');
+        current_col_delete_link.css('left', col_position + ((cell_width/2)-8) +'px');
+
+    };
+
+
+    /**
      * Update row positions array
      */
     $.updateRowPositionsCache = function() {
@@ -199,6 +247,16 @@ $(document).ready(function(e) {
     };
 
 
+    /**
+     *  Update col position array
+     */
+    $.updateColPositionCache = function() {
+        col_positions = [];
+        for(var i=0; i < num_cols; i++) {
+            var col_position = i*cell_width;
+            col_positions.push( col_position );
+        }
+    };
 
 
     var the_table = $.getTable();
@@ -231,14 +289,14 @@ $(document).ready(function(e) {
     var x = 0;
     var y = 0;
 
-    $.addRowDragger(1); // add for 1st
+    $.addRowActions(1); // add for 1st
 
     $.getTableCells().each(function(e) {
         if(x >= num_cols) {
             x = 0;
             y++;
 
-            $.addRowDragger(y+1);
+            $.addRowActions(y+1);
 
             row_positions.push(y*cell_height);
         }
@@ -247,7 +305,7 @@ $(document).ready(function(e) {
 
         if(y === 0) {
             col_positions.push(x*cell_width);            // as long as we are on first row, store col positions
-            $.addColDragger(x+1);
+            $.addColActions(x+1);
         }
 
         x++;
@@ -274,7 +332,7 @@ $(document).ready(function(e) {
         var new_row_num = num_rows+1;
         var new_row_position = (num_rows*cell_height);
 
-        $.addRowDragger(new_row_num);
+        $.addRowActions(new_row_num);
 
         for(var i=0; i < num_cols; i++ ) {
             the_table.append(
@@ -301,7 +359,7 @@ $(document).ready(function(e) {
         var new_col_num = num_cols+1;
         var new_col_position = (num_cols*cell_width);
 
-        $.addColDragger(new_col_num);
+        $.addColActions(new_col_num);
         for(var i=0; i < num_rows; i++) {
             the_table.append(
                 '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+(i+1)+'" data-col="'+new_col_num+'"><textarea></textarea></div>'
@@ -328,7 +386,7 @@ $(document).ready(function(e) {
         the_table_row.addClass('table__cell-pending-delete');
         if(confirm('Sure you want to delete the row?')) {
 
-            // remove the
+            // remove the row + elements
             the_table_row.remove();
             the_table_row_dragger.remove();
             the_table_row_delete_link.remove();
@@ -348,6 +406,34 @@ $(document).ready(function(e) {
 
         } else {
             the_table_row.removeClass('table__cell-pending-delete');
+        }
+    });
+
+
+    $(document).on('click', '.table__table__delete-col', function(e) {
+
+        var col = $(this).data('col');
+        var the_table_col = $.getTableCol(col);
+        var the_table_col_dragger = $.getTableColDragger(col);
+        var the_table_col_delete_link = $.getTableColDeleteLink(col);
+
+        the_table_col.addClass('table__cell-pending-delete');
+        if(confirm('Sure you want to delete the column?')) {
+
+            the_table_col.remove();
+            the_table_col_dragger.remove();
+            the_table_col_delete_link.remove();
+
+            num_cols --;
+            the_table.css('width', cell_width*num_cols);
+            $.updateColPositionCache();
+
+            for(var i=col; i <= num_cols; i++) {
+                $.updateTableCol(i+1, -1);
+            }
+
+        } else {
+            the_table_col.removeClass('table__cell-pending-delete');
         }
     });
 
@@ -383,6 +469,7 @@ $(document).ready(function(e) {
         e.stopPropagation();
 
         $(this).addClass('active__dragging__link');
+        $.getTableColDeleteLink().fadeOut();
 
         var col = $(this).data('col');
 
@@ -572,6 +659,8 @@ $(document).ready(function(e) {
 
 
         } else if(drag_col) {
+
+            $.getTableColDeleteLink().fadeIn();
 
             var closest_col = $.closest(last_drag_x, col_positions);
             var row_x = closest_col.closest;

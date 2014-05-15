@@ -101,10 +101,8 @@ a.table__table__add-col:visited {
   border: 1px dotted;
 }
 
-.table__table__delete-row {
+.table__table__delete-row, .table__table__delete-col {
   position:absolute;
-  left: -16px;
-  top:0;
   font-size: 16px;
   cursor: pointer;
   z-index: 99;
@@ -116,6 +114,16 @@ a.table__table__add-col:visited {
   &:hover {
     color: #e11842;
   }
+}
+
+.table__table__delete-row {
+  left: -16px;
+  top:0;
+}
+
+.table__table__delete-col {
+  top: -17px;
+  left:0;
 }
 
 .drag-row {
@@ -138,6 +146,10 @@ a.table__table__add-col:visited {
   top: -20px;
   left: 181px;
   z-index:99;
+}
+
+.table__cell-pending-delete {
+  opacity: 0.8;
 }
 
 .table__table {
