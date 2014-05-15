@@ -31,8 +31,8 @@ $iconMuted:         #eee;
   font-family: 'FontAwesome';
   src: url('#{$fontAwesomePath}/fontawesome-webfont.eot?v=3.0.1');
   src: url('#{$fontAwesomePath}/fontawesome-webfont.eot?#iefix&v=3.0.1') format("embedded-opentype"),
-  url('#{$fontAwesomePath}/fontawesome-webfont.woff?v=3.0.1') format("woff"),
-  url('#{$fontAwesomePath}/fontawesome-webfont.ttf?v=3.0.1') format("truetype");
+    url('#{$fontAwesomePath}/fontawesome-webfont.woff?v=3.0.1') format("woff"),
+    url('#{$fontAwesomePath}/fontawesome-webfont.ttf?v=3.0.1') format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -261,10 +261,8 @@ ul.icons {
   .btn .icon-spin { height: auto; }
   .icon-spin.icon-large { height: 1.25em; }
   .btn .icon-spin.icon-large { height: .75em; }
-}.icon-ok:before		{ content: "\f021"; }
-.icon-remove:before		{ content: "\f022"; }
-.icon-trash:before		{ content: "\f023"; }
-.icon-move:before		{ content: "\f024"; }
-.icon-remove-circle:before		{ content: "\f025"; }
-.icon-reorder:before		{ content: "\f026"; }
-.icon-plus-sign-alt:before		{ content: "\f027"; }
+}.icon-align-left:before		{ content: "\f021"; }
+.icon-picture:before		{ content: "\f022"; }
+.icon-remove-circle:before		{ content: "\f023"; }
+.icon-reorder:before		{ content: "\f024"; }
+.icon-plus-sign-alt:before		{ content: "\f025"; }

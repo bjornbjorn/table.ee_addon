@@ -1,4 +1,6 @@
 @import "icons";
+@import "arrows";
+@import "mixins";
 
 /* apply a natural box layout model to all elements */
 *, *:before, *:after {
@@ -28,12 +30,59 @@ a.table__table__add-col:visited {
   white-space: nowrap;
   cursor: pointer;
   background-color: #d0d9e1;
+  position: relative;
 
   &:hover {
     background-color: #e11842;
     color: #fff;
   }
 }
+
+
+/**
+ * The dropdown displayed when adding a row to
+ * select between multiple row types
+ */
+.table__table__add-row-dropdown {
+  font-size: 12px;
+  position: absolute;
+  top:45px;
+  left: 10px;
+  background-color: #d0d9e1;
+  width: 200px;
+  height: 80px;
+  @include arrow(top, 'left', #d0d9e1);
+  z-index: 9999;
+  padding: 10px;
+  display: none;
+}
+
+ul.table__table__row-types {
+  list-style: none;
+
+  li {
+
+    color: #5f6c74;
+    padding: 2px 0 2px 0;
+
+    a, a:link, a:visited, a:active {
+      text-decoration: none;
+      display: block;
+      padding: 5px;
+      @include vendor('border-radius', 2px);
+      background-color: #f5f6f5;
+
+      &:hover {
+        background-color: #e11842;
+        color: #fff !important;
+      }
+    }
+
+
+
+  }
+}
+
 
 
 

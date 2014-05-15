@@ -259,6 +259,34 @@ $(document).ready(function(e) {
     };
 
 
+    /**
+     * Add a standard Text row to the table
+     */
+    $.addTableTextRow = function() {
+        var the_table = $.getTable();
+        var field_id = the_table.data('field_id');
+
+        the_table.css('height', $.getTableHeight() + cell_height);
+        var new_row_num = num_rows+1;
+        var new_row_position = (num_rows*cell_height);
+
+        $.addRowActions(new_row_num);
+
+        for(var i=0; i < num_cols; i++ ) {
+            the_table.append(
+                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
+            );
+        }
+
+        row_positions.push(new_row_position);
+        num_rows++;
+
+        $.getTableLeftBar().css('height', ($.getTableHeight() + 20) + 'px' );
+
+        $.updateTableCells();
+    };
+
+
     var the_table = $.getTable();
 
     var cell_width = 200;
@@ -325,34 +353,31 @@ $(document).ready(function(e) {
     $('.table__table__add-row').on('click', function(e) {
         e.preventDefault();
 
-        var the_table = $.getTable();
-        var field_id = the_table.data('field_id');
-
-        the_table.css('height', $.getTableHeight() + cell_height);
-        var new_row_num = num_rows+1;
-        var new_row_position = (num_rows*cell_height);
-
-        $.addRowActions(new_row_num);
-
-        for(var i=0; i < num_cols; i++ ) {
-            the_table.append(
-                '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+(i+1)+'"><textarea></textarea></div>'
-            );
+        if($('.table__table__add-row-dropdown').is(':visible')) {
+            $('.table__table__add-row-dropdown').hide();
+        } else {
+            $('.table__table__add-row-dropdown').show();
         }
-
-        row_positions.push(new_row_position);
-        num_rows++;
-
-        $.getTableLeftBar().css('height', ($.getTableHeight() + 20) + 'px' );
-
-        $.updateTableCells();
     });
+
+
+    $('.table__table__add-text-row').on('click', function(e) {
+        e.preventDefault();
+
+        $('.table__table__add-row-dropdown').hide();
+
+        $.addTableTextRow();
+    });
+
+
 
     /**
      * Add col button click handler
      */
     $('.table__table__add-col').on('click', function(e) {
         e.preventDefault();
+
+        $('.table__table__add-row-dropdown').hide();    // just in case it is showing
 
         var the_table = $.getTable();
         the_table.css('width', $('.table__table').width() + cell_width);

@@ -1,6 +1,27 @@
 <a href="#" class="table__table__add-row">
     <i class="icon-plus-sign-alt"></i> Add row
 </a>
+
+<div style="position:relative; float:left;">
+    <div class="table__table__add-row-dropdown">
+
+        <ul class="table__table__row-types">
+            <li>
+                <a href="#" class="table__table__add-text-row">
+                    <i class="icon-align-left"></i> Text
+                </a>
+            </li>
+            <li>
+                <a href="#" class="table__table__add-title-image-row">
+                    <i class="icon-picture"></i> Header (title / image)
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+
 <a href="#" class="table__table__add-col">
     <i class="icon-plus-sign-alt"></i> Add column
 </a>
