@@ -54,6 +54,11 @@ $(document).ready(function(e) {
         return num_rows * cell_height;
     };
 
+    $.getAssetsImgThumb = function(file_id) {
+        var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=50x50&hash='+Math.random();
+        return '<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>';
+    };
+
 
     /**
      * Update the cell content data for a Title/Image cell
@@ -102,15 +107,37 @@ $(document).ready(function(e) {
                 var current_cell = $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
                 var rowtype = current_cell.data('row-type');
                 var cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']['+rowtype+']';
+                var cell_inited = current_cell.data('inited') !== 0;
 
                 switch(rowtype) {
                     case 'text':
+
+                        if(!cell_inited) {
+
+                            var text_value = current_cell.data('init-cell-value');
+                            var cell_content = $.getNewTextCellContent(row, col, text_value);
+                            current_cell.attr('inited', 1);
+                            current_cell.data('inited', 1);
+                            current_cell.html(cell_content);
+                        }
+
                         var current_cell_first_child =  current_cell.children().first();
                         current_cell_first_child.attr('tabindex', tabindex);
                         current_cell_first_child.attr('name', cell_data_name);
                         break;
 
                     case 'title_image':
+
+                        if(!cell_inited) {
+
+                            var init_cell_value = current_cell.data('init-cell-value');
+
+                            var title_image_cell_content = $.getNewTitleImageCellContent(row, col, init_cell_value.assets_file_id, init_cell_value.title_text);
+                            current_cell.attr('inited', 1);
+                            current_cell.data('inited', 1);
+                            current_cell.html(title_image_cell_content);
+                        }
+
                         $.updateTitleImageCellData(row, col, field_id, cell_data_name, current_cell);
                         break;
                 }
@@ -307,8 +334,14 @@ $(document).ready(function(e) {
      * @param col_num
      * @returns {string}
      */
-    $.getNewTextCellContent = function(row_num, col_num) {
-        return '<textarea></textarea>';
+    $.getNewTextCellContent = function(row_num, col_num, text_value) {
+
+        if(text_value !== undefined) {
+            return '<textarea>'+text_value+'</textarea>';
+        }
+        else {
+            return '<textarea></textarea>';
+        }
     };
 
     /**
@@ -318,8 +351,17 @@ $(document).ready(function(e) {
      * @param col_num
      * @returns {string}
      */
-    $.getNewTitleImageCellContent = function(row_num, col_num) {
-        return '<input type="hidden"><input type="text"><div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
+    $.getNewTitleImageCellContent = function(row_num, col_num, assets_file_id, title_text) {
+
+        var html = '<input type="hidden"><input type="text" value="'+(title_text !== undefined ? title_text : '')+'">';
+
+        if(assets_file_id === undefined) {
+            html += '<div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
+        } else {
+            html += '<div class="table__table__cell-add-image-controls" style="display:none"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls">'+ $.getAssetsImgThumb(assets_file_id) +'</div>';
+        }
+
+        return html;
     };
 
 
@@ -394,9 +436,6 @@ $(document).ready(function(e) {
 
 
 
-
-
-
     /**
      * Initiate the table. Will move cells around to their correct
      * initial positions.
@@ -431,6 +470,7 @@ $(document).ready(function(e) {
 
     $.getTableLeftBar().css('height', ((num_rows*cell_height) + 20) + 'px' );
 
+    $.updateTableCells();
 
 
     // add transitions class after we have positioned them
@@ -501,8 +541,8 @@ $(document).ready(function(e) {
                 if(files.length > 0) {
                     add_image_controls_div.hide();
                     var file_id = files[0].id;
-                    var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=50x50&hash='+Math.random();
-                    remove_image_controls_div.prepend('<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>');
+                    var img_tag = $.getAssetsImgThumb(file_id);
+                    remove_image_controls_div.prepend(img_tag);
                     remove_image_controls_div.fadeIn();
                 }
             }

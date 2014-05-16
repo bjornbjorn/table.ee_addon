@@ -39,12 +39,10 @@
             foreach($table_rows as $table_row) {
                 $col_num = 1;
                 while(isset($table_row['col_'.$col_num])) {
-                    $cell_value = $table_row['col_'.$col_num];
-
+                    $row_type = $table_row['row_type'];
+                    $cell_value = htmlentities($table_row['col_'.$col_num]);
                     ?>
-                    <div data-row="<?php echo $row_num?>" data-row-type="text" data-col="<?php echo $col_num?>" class="table__cell">
-                        <textarea name="table_cell_<?php echo $field_id?>[<?php echo $row_num?>][<?php echo $col_num?>]"><?php echo $cell_value?></textarea>
-                    </div>
+                    <div data-inited="0" data-row-type="<?php echo $row_type?>" data-row="<?php echo $row_num?>" data-row-type="text" data-col="<?php echo $col_num?>" data-init-cell-value="<?php echo $cell_value?>" class="table__cell"></div>
                     <?php
                     $col_num++;
                 }
