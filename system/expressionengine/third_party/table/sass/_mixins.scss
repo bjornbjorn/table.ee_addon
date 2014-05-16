@@ -13,3 +13,26 @@
   -o-#{$property}:$value;
   #{$property}:$value;
 }
+
+
+@mixin button() {
+  &:hover, &:link, &:visited {
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-block;
+    margin: 10px 0 10px 0;
+    @include vendor('border-radius', 3px);
+    border: none;
+    padding: 5px 9px;
+    color: #5f6c74;
+    white-space: nowrap;
+    cursor: pointer;
+    background-color: #d0d9e1;
+    position: relative;
+  }
+
+  &:hover {
+    background-color: #e11842;
+    color: #fff;
+  }
+}

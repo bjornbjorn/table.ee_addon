@@ -1,0 +1,33 @@
+/**
+ * CSS for the title / image row type
+ */
+
+.table__cell[data-row-type="title_image"] {
+
+  input[type=text] {
+    @include vendor('border-radius', 0);
+    border-top: none;
+    border-left: none;
+    border-right:none;
+    border-bottom: 1px dotted #e3e3e3;
+    height: 24px;
+    line-height: 24px;
+    text-align:center;
+    font-weight: bold;
+  }
+
+  .table__table__cell-add-image-controls {
+    width:100%;
+    text-align:center;
+  }
+
+  .table__table__cell__add-image-button {
+    @include button();
+  }
+
+  .table__table__cell-remove-image-controls {
+    width:100%;
+    padding: 10px;
+    text-align:center;
+  }
+}

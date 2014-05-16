@@ -142,6 +142,12 @@ class Table_ft extends EE_Fieldtype {
                     'type' => 'int',
                     'constraint' => '10',
                     'null' => FALSE),
+
+                'row_type' => array(
+                    'type' => 'varchar',
+                    'constraint' => '255',
+                    'null' => FALSE
+                ),
             );
 
             $this->EE->dbforge->add_field($table_fields);
@@ -171,14 +177,19 @@ class Table_ft extends EE_Fieldtype {
         if($field_name) {
 
             $table_data = ee()->input->post('table_cell_'.$field_id);
+
             $entry_id = $this->settings['entry_id'];
 
             $table_name = Table_ft::TABLE_PREFIX.$field_name;
             // delete all rows for this entry_od
             ee()->db->where('entry_id', $entry_id)->delete($table_name);
 
+            /**
+             * Data format (example submit) http://pastebin.com/raw.php?i=wdt6PKuN
+             */
             if(isset($table_data[1])) { // we have table data
                 $num_cols = count($table_data[1]);
+
 
                 /**
                  * hack to flush the cache of table names - not sure if it is needed here but doing it anyway
@@ -204,14 +215,19 @@ class Table_ft extends EE_Fieldtype {
 
                 for($j=1; $j <= count($table_data); $j++) {
 
+                    // right now each cell has the type, but we only care about row type for now...
+                    $row_type = isset($table_data[$j][1]['title_image']) ? 'title_image' : 'text';       // @todo fix this when we have more row types
+
                     $insert_data = array(
                         'entry_id' => $entry_id,
                         'row' => $j,
+                        'row_type' => $row_type,
                     );
 
                     $col_data = $table_data[$j];
+
                     for($c = 1; $c <= count($col_data); $c++) {
-                        $insert_data['col_'.$c] = $col_data[$c];
+                        $insert_data['col_'.$c] = $col_data[$c][$row_type];                             // @todo fix this when each cell can have different types?
                     }
 
                     ee()->db->insert($table_name, $insert_data);

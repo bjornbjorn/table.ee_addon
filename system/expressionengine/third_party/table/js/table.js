@@ -54,6 +54,36 @@ $(document).ready(function(e) {
         return num_rows * cell_height;
     };
 
+
+    /**
+     * Update the cell content data for a Title/Image cell
+     *
+     * @param row
+     * @param col
+     */
+    $.updateTitleImageCellData = function(row, col, field_id, cell_data_name, cell_ref) {
+
+        if(field_id === undefined) {
+            field_id = $.getTable().data('field_id');
+        }
+        if(cell_data_name === undefined) {
+            cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']';
+        }
+        if(typeof cell_ref == "undefined") {
+            cell_ref = $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
+        }
+
+        var hidden_input = cell_ref.find('input[type=hidden]');
+        hidden_input.attr('name', cell_data_name);
+
+        // update the value of the hidden with the current values of the content
+        var assets_file_id = cell_ref.find('img').data('assets_file_id');
+        var title_text = cell_ref.find('input[type=text]').val();
+
+        hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id, title_text: title_text} ));
+
+    };
+
     /**
      * Update all table cells w/correct tabindex etc. - this is needed after
      * dragging around rows/cols and adding/removing rows/cols
@@ -69,11 +99,23 @@ $(document).ready(function(e) {
         for(var row=1; row < (num_rows+1); row++) {
             for(var col=1; col < (num_cols+1); col++) {
                 tabindex++;
-                var current_cell_first_child =  $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"] :first-child');
+                var current_cell = $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
+                var rowtype = current_cell.data('row-type');
+                var cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']['+rowtype+']';
 
-                // set tabindex
-                current_cell_first_child.attr('tabindex', tabindex);
-                current_cell_first_child.attr('name', 'table_cell_'+field_id+'['+row+']['+col+']');
+                switch(rowtype) {
+                    case 'text':
+                        var current_cell_first_child =  current_cell.children().first();
+                        current_cell_first_child.attr('tabindex', tabindex);
+                        current_cell_first_child.attr('name', cell_data_name);
+                        break;
+
+                    case 'title_image':
+                        $.updateTitleImageCellData(row, col, field_id, cell_data_name, current_cell);
+                        break;
+                }
+
+
             }
         }
     };
@@ -277,7 +319,7 @@ $(document).ready(function(e) {
      * @returns {string}
      */
     $.getNewTitleImageCellContent = function(row_num, col_num) {
-        return '<input type="text"><div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
+        return '<input type="hidden"><input type="text"><div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
     };
 
 
@@ -458,11 +500,9 @@ $(document).ready(function(e) {
 
                 if(files.length > 0) {
                     add_image_controls_div.hide();
-
-
                     var file_id = files[0].id;
-                    var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=200x200&hash='+Math.random();
-                    remove_image_controls_div.prepend('<img src="'+thumb_url+'"/>');
+                    var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=50x50&hash='+Math.random();
+                    remove_image_controls_div.prepend('<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>');
                     remove_image_controls_div.fadeIn();
                 }
             }
@@ -507,7 +547,7 @@ $(document).ready(function(e) {
                     break;
             }
             the_table.append(
-                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
+                '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row-type="'+row_type+'" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
             );
         }
 

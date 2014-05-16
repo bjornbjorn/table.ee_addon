@@ -42,7 +42,7 @@
                     $cell_value = $table_row['col_'.$col_num];
 
                     ?>
-                    <div data-row="<?php echo $row_num?>" data-col="<?php echo $col_num?>" class="table__cell">
+                    <div data-row="<?php echo $row_num?>" data-row-type="text" data-col="<?php echo $col_num?>" class="table__cell">
                         <textarea name="table_cell_<?php echo $field_id?>[<?php echo $row_num?>][<?php echo $col_num?>]"><?php echo $cell_value?></textarea>
                     </div>
                     <?php
