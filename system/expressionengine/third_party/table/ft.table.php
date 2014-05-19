@@ -15,6 +15,7 @@ class Table_ft extends EE_Fieldtype {
     public $has_array_data = TRUE;
 
     const TABLE_PREFIX = 'table_';
+    const TAG_PREFIX = 'table:';
 
     public function __construct()
     {
@@ -254,6 +255,33 @@ class Table_ft extends EE_Fieldtype {
             $table_name = Table_ft::TABLE_PREFIX.$field_name;
             ee()->db->where_in('entry_id', $entry_ids)->delete($table_name);
         }
+    }
+
+
+    /**
+     * Replace Grid template tags
+     */
+    public function replace_tag($data, $params = '', $tagdata = '')
+    {
+        if (empty($tagdata))
+        {
+            return '';
+        }
+
+        if(isset($this->row) && isset($this->row['entry_id'])) {
+            $entry_id = $this->row['entry_id'];
+
+            // find field short name
+            ee()->load->library('table_lib');
+            $field_name = ee()->table_lib->get_field_name($this->id());             // @todo: fix this when EE implements a sensible way to get field_name everywhere! (right now this->name() returns different results in each hook!)
+            if($field_name) {
+                    $tagdata = ee()->table_lib->parse_tagdata($entry_id, $field_name, $tagdata);
+                } else {
+                    $tagdata = '';
+            }
+        }
+
+        return $tagdata;
     }
 
 
