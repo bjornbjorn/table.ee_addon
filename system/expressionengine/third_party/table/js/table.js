@@ -356,9 +356,9 @@ $(document).ready(function(e) {
         var html = '<input type="hidden"><input type="text" value="'+(title_text !== undefined ? title_text : '')+'">';
 
         if(assets_file_id === undefined) {
-            html += '<div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"></div>';
+            html += '<div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"><div class="table__table__cell-thumbnail"></div><a href="#" class="table__table__cell__remove-image-button">Remove image</a></div>';
         } else {
-            html += '<div class="table__table__cell-add-image-controls" style="display:none"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls">'+ $.getAssetsImgThumb(assets_file_id) +'</div>';
+            html += '<div class="table__table__cell-add-image-controls" style="display:none"><a href="#" class="table__table__cell__add-image-button">Add image</a></div><div class="table__table__cell-remove-image-controls"><div class="table__table__cell-thumbnail">'+ $.getAssetsImgThumb(assets_file_id) +'</div><a href="#" class="table__table__cell__remove-image-button">Remove image</a></div>';
         }
 
         return html;
@@ -526,8 +526,8 @@ $(document).ready(function(e) {
         e.preventDefault();
 
         var add_image_controls_div = $(this).parent();
-        var remove_image_controls_div = $(this).parent().next();
-
+        var thumb_image_div = add_image_controls_div.parent().find('.table__table__cell-thumbnail');
+        var remove_image_controls_div = add_image_controls_div.parent().find('.table__table__cell-remove-image-controls');
         var assets_sheet = new Assets.Sheet({
 
             // optional settings (these are the default values):
@@ -542,7 +542,7 @@ $(document).ready(function(e) {
                     add_image_controls_div.hide();
                     var file_id = files[0].id;
                     var img_tag = $.getAssetsImgThumb(file_id);
-                    remove_image_controls_div.prepend(img_tag);
+                    thumb_image_div.html(img_tag);
                     remove_image_controls_div.fadeIn();
                 }
             }
@@ -551,6 +551,17 @@ $(document).ready(function(e) {
         assets_sheet.show();
     });
 
+
+    $(document).on('click', '.table__table__cell__remove-image-button', function(e) {
+        e.preventDefault();
+        var remove_image_controls_div = $(this).parent();
+        var add_image_controls_div = remove_image_controls_div.parent().find('.table__table__cell-add-image-controls');
+        var thumb_image_div = remove_image_controls_div.find('.table__table__cell-thumbnail');
+        thumb_image_div.html('');
+        remove_image_controls_div.hide();
+        add_image_controls_div.fadeIn();
+
+    });
 
 
     /**
