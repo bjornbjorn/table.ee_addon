@@ -158,6 +158,27 @@ class Table_ft extends EE_Fieldtype {
     }
 
 
+    public function save($data)
+    {
+        $channel_data_for_field = '';
+        $field_id = $this->id();
+        if($field_id) {
+
+            $table_data = ee()->input->post('table_cell_'.$field_id);
+
+            if(isset($table_data[1])) { // we have table data
+                $num_cols = count($table_data[1]);
+
+                if($num_cols > 0) {
+                    $channel_data_for_field = 'y';  // store y if we have table data
+                }
+            }
+        }
+
+        return $channel_data_for_field;
+    }
+
+
     /**
      * Save the data entered by the user
      *
@@ -169,7 +190,7 @@ class Table_ft extends EE_Fieldtype {
         $field_id = $this->id();
         ee()->load->library('table_lib');
 
-        // $field_name = $this->name(); <- lol here $this->name() contains 'field_id_5' instead of field short name (which you will get while saving field)
+        // $field_name = $this->name(); <- here $this->name() contains 'field_id_5' instead of field short name (which you will get while saving field)
 
         // find field short name
 

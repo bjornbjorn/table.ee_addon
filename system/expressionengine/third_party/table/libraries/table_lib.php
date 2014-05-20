@@ -45,7 +45,7 @@ class Table_lib {
         if($row_type == 'title_image') {
             $content_obj = json_decode($raw_content);
             $content_html = '<h2>'.$content_obj->title_text.'</h2>';
-            if($content_obj->assets_file_id) {
+            if(isset($content_obj->assets_file_id)) {
                 ee()->load->add_package_path(PATH_THIRD.'assets/');
                 require_once PATH_THIRD.'assets/sources/ee/file.ee.php';
                 require_once PATH_THIRD.'assets/helper.php';
