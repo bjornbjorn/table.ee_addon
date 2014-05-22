@@ -68,7 +68,7 @@ class Table_lib {
      * @param $field_name the field name (ie. blog_table)
      * @param $tagdata the tagdata (content inside the tag pair)
      */
-    public function parse_tagdata($entry_id, $field_name, $tagdata)
+    public function parse_tagdata($entry_id, $field_name, $tagdata, $params)
     {
         $table_name = Table_ft::TABLE_PREFIX.$field_name;
         $num_cols = 0;
@@ -95,20 +95,49 @@ class Table_lib {
                     $i++;
                 }
 
+                $num_cols = $i-1;
+
                 $rows[] = array(
-                    Table_ft::TAG_PREFIX.'row_num' => $row_num,
-                    Table_ft::TAG_PREFIX.'num_cols' => ($i-1),
-                    Table_ft::TAG_PREFIX.'row_type' => $row_type,
+                    Table_ft::TAG_PREFIX.'row:num' => $row_num,
+                    Table_ft::TAG_PREFIX.'row:total_cols' => $num_cols,
+                    Table_ft::TAG_PREFIX.'row:type' => $row_type,
                     Table_ft::TAG_PREFIX.'col' => $col
                 );
-
-                $num_cols = $i-1;
             }
 
+            $mobile_tables = array();
+
+            // go through all cols
+
+            for($col_index = 1; $col_index < $num_cols; $col_index++) {
+                $mobile_rows = array();
+
+                foreach($rows as $row) {
+                    $mobile_row = $row;
+                    $mobile_row[Table_ft::TAG_PREFIX.'row:total_cols'] = 2;
+                    $mobile_row[Table_ft::TAG_PREFIX.'col'] = array(
+                        $row[Table_ft::TAG_PREFIX.'col'][0],
+                        $row[Table_ft::TAG_PREFIX.'col'][$col_index]
+                    );
+                    $mobile_rows[] = $mobile_row;
+                }
+
+                $mobile_tables[] = array( Table_ft::TAG_PREFIX.'mobile' => $mobile_rows );
+            }
+
+
+
+
+            //print_r($rows);
+
+         //   print_r($mobile_tables);
+         //   die();
+
             $vars = array(
-                Table_ft::TAG_PREFIX.'num_rows' => count($rows),
-                Table_ft::TAG_PREFIX.'num_cols' => $num_cols,
-                Table_ft::TAG_PREFIX.'rows' => $rows
+                Table_ft::TAG_PREFIX.'total_rows' => count($rows),
+                Table_ft::TAG_PREFIX.'total_cols' => $num_cols,
+                Table_ft::TAG_PREFIX.'rows' => $rows,
+                Table_ft::TAG_PREFIX.'mobile_tables' => $mobile_tables
             );
 
             $tagdata = ee()->TMPL->parse_variables($tagdata, array($vars));

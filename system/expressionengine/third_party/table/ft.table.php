@@ -296,7 +296,7 @@ class Table_ft extends EE_Fieldtype {
             ee()->load->library('table_lib');
             $field_name = ee()->table_lib->get_field_name($this->id());             // @todo: fix this when EE implements a sensible way to get field_name everywhere! (right now this->name() returns different results in each hook!)
             if($field_name) {
-                    $tagdata = ee()->table_lib->parse_tagdata($entry_id, $field_name, $tagdata);
+                    $tagdata = ee()->table_lib->parse_tagdata($entry_id, $field_name, $tagdata, $params);
                 } else {
                     $tagdata = '';
             }
