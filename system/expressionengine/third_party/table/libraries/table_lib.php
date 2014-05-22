@@ -122,7 +122,7 @@ class Table_lib {
                     $mobile_rows[] = $mobile_row;
                 }
 
-                $mobile_tables[] = array( Table_ft::TAG_PREFIX.'mobile' => $mobile_rows );
+                $mobile_tables[] = array( Table_ft::TAG_PREFIX.'mobile:rows' => $mobile_rows );
             }
 
 
@@ -137,7 +137,7 @@ class Table_lib {
                 Table_ft::TAG_PREFIX.'total_rows' => count($rows),
                 Table_ft::TAG_PREFIX.'total_cols' => $num_cols,
                 Table_ft::TAG_PREFIX.'rows' => $rows,
-                Table_ft::TAG_PREFIX.'mobile_tables' => $mobile_tables
+                Table_ft::TAG_PREFIX.'mobile:tables' => $mobile_tables
             );
 
             $tagdata = ee()->TMPL->parse_variables($tagdata, array($vars));
