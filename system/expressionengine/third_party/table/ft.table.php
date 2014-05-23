@@ -39,30 +39,74 @@ class Table_ft extends EE_Fieldtype {
             'table_num_cols' => 0,
         );
 
+        $field_id = $this->field_id;
+        $table_post_data = ee()->input->post('table_cell_'.$field_id);
         $entry_id = $this->content_id();
-        if($entry_id > 0) {
-            // entry is saved so we look up the saved data
 
-            $field_name = ee()->table_lib->get_field_name($this->field_id);
+        /**
+         * If we have POST data here it might be a result of a save with validation errors
+         */
+        if($table_post_data) {
 
-            $q = ee()->db->where('entry_id', $entry_id)->order_by('row')->get(Table_ft::TABLE_PREFIX.$field_name);
-
-            $table_rows = $q->result_array();
-            $table_num_rows = $q->num_rows();
             $table_num_cols = 0;
-
-            // count columns
+            $table_num_rows = count($table_post_data);
             if($table_num_rows > 0) {
-                $col_id = 1;
-                while(isset($table_rows[0]['col_'.$col_id])) {
-                    $table_num_cols++;
-                    $col_id++;
+                $table_num_cols = count($table_post_data[1]);   // get number of cols for first row
+            }
+
+            // convert POST data to the format we get it from the db
+            $table_rows = array();
+            for($j=1; $j <= count($table_post_data); $j++) {
+
+                // right now each cell has the type, but we only care about row type for now...
+                $row_type = isset($table_post_data[$j][1]['title_image']) ? 'title_image' : 'text';       // @todo fix this when we have more row types
+
+                $row_data = array(
+                    'entry_id' => $entry_id,
+                    'row' => $j,
+                    'row_type' => $row_type,
+                );
+
+                $col_data = $table_post_data[$j];
+
+                for($c = 1; $c <= count($col_data); $c++) {
+                    $row_data['col_'.$c] = $col_data[$c][$row_type];                             // @todo fix this when each cell can have different types?
                 }
+
+                $table_rows[] = $row_data;
             }
 
             $vars['table_rows'] = $table_rows;
             $vars['table_num_rows'] = $table_num_rows;
             $vars['table_num_cols'] = $table_num_cols;
+
+        } else {
+
+            if($entry_id > 0) {
+                // entry is saved so we look up the saved data
+
+                $field_name = ee()->table_lib->get_field_name($field_id);
+
+                $q = ee()->db->where('entry_id', $entry_id)->order_by('row')->get(Table_ft::TABLE_PREFIX.$field_name);
+
+                $table_rows = $q->result_array();
+
+                $table_num_rows = $q->num_rows();
+                $table_num_cols = 0;
+
+                // count columns
+                if($table_num_rows > 0) {
+                    $col_id = 1;
+                    while(isset($table_rows[0]['col_'.$col_id])) {
+                        $table_num_cols++;
+                        $col_id++;
+                    }
+                }
+
+                $vars['table_rows'] = $table_rows;
+                $vars['table_num_rows'] = $table_num_rows;
+                $vars['table_num_cols'] = $table_num_cols;
+            }
         }
 
 
