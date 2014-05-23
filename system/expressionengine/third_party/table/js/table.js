@@ -54,6 +54,10 @@ $(document).ready(function(e) {
         return num_rows * cell_height;
     };
 
+    $.getTableWidth = function() {
+        return num_cols * cell_width;
+    };
+
     $.getAssetsImgThumb = function(file_id) {
         var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=50x50&hash='+Math.random();
         return '<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>';
@@ -442,11 +446,16 @@ $(document).ready(function(e) {
      *
      */
     the_table.height($.getTableHeight());
+    if(num_cols > 0) {
+        the_table.width($.getTableWidth());
+    }
 
     var x = 0;
     var y = 0;
 
-    $.addRowActions(1); // add for 1st
+    if(num_rows > 0) {
+        $.addRowActions(1); // add for 1st
+    }
 
     $.getTableCells().each(function(e) {
         if(x >= num_cols) {
@@ -463,6 +472,7 @@ $(document).ready(function(e) {
         if(y === 0) {
             col_positions.push(x*cell_width);            // as long as we are on first row, store col positions
             $.addColActions(x+1);
+            console.log("adding col actions");
         }
 
         x++;
@@ -578,7 +588,7 @@ $(document).ready(function(e) {
         $('.table__table__add-row-dropdown').hide();    // just in case it is showing
 
         var the_table = $.getTable();
-        the_table.css('width', $('.table__table').width() + cell_width);
+        the_table.css('width', $.getTableWidth() + cell_width);
         var new_col_num = num_cols+1;
         var new_col_position = (num_cols*cell_width);
 
@@ -915,8 +925,6 @@ $(document).ready(function(e) {
                 $(this).css('left', ((col_counter * cell_width)-19) + 'px' );
                 $(this).attr('data-col', col_counter);
                 $(this).data('col', col_counter);
-
-                console.log("showing col " + col_counter);
                 col_counter++;
 
                 $(this).show();

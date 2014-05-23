@@ -13,7 +13,7 @@
  * Add row / col buttons
  */
 a.table__table__add-row,
-a.table__table__add-col,
+a.table__table__add-col
 {
     @include button();
 }
@@ -101,6 +101,7 @@ ul.table__table__row-types {
   margin: 20px 0 0 20px;
   position: relative;
   height: 100px;
+  min-width: 100%;
 }
 
 .table__cell {
