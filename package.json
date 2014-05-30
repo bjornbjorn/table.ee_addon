@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-
+  "version": "1.0.0",
+  "repository": "git@bitbucket.org:lastfriday/table.ee_addon.git",
   "engines": {
     "node": ">= 0.10.0"
   },
