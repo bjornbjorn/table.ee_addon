@@ -75,10 +75,22 @@ class Table_lib {
      */
     public function parse_tagdata($entry_id, $field_name, $tagdata, $params)
     {
+        $row_limit = isset($params['row_limit']) ? $params['row_limit'] : FALSE;
+        $row_offset = isset($params['row_offset']) ? $params['row_offset'] : FALSE;
+
         $table_name = Table_ft::TABLE_PREFIX.$field_name;
         $num_cols = 0;
         $row_num = 0;
-        $q = ee()->db->where('entry_id', $entry_id)->order_by('row')->get($table_name);
+
+        ee()->db->where('entry_id', $entry_id);
+        if($row_limit) {
+            ee()->db->limit($row_limit);
+        }
+        if($row_offset) {
+            ee()->db->offset($row_offset);
+        }
+
+        $q = ee()->db->order_by('row')->get($table_name);
         if($q->num_rows() > 0) {
 
             $rows = array();
