@@ -126,7 +126,7 @@
                     cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']';
                 }
                 if(typeof cell_ref == "undefined") {
-                    cell_ref = $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
+                    cell_ref = $('#table__table__'+field_id+' .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
                 }
 
                 var hidden_input = cell_ref.find('input[type=hidden]');
@@ -153,7 +153,7 @@
                 for(var row=1; row < (num_rows+1); row++) {
                     for(var col=1; col < (num_cols+1); col++) {
                         tabindex++;
-                        var current_cell = $('.table__table .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
+                        var current_cell = $('#table__table__'+field_id+' .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
                         var rowtype = current_cell.data('row-type');
                         var cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']['+rowtype+']';
                         var cell_inited = current_cell.data('inited') !== 0;
@@ -476,8 +476,6 @@
             var drag_col = false;       // col number being dragged
             var last_drag_x = false;    // last X position used for row when dragging
             var last_drag_y = false;    // last Y position used for col when dragging
-
-
 
             /**
              * Initiate the table. Will move cells around to their correct
