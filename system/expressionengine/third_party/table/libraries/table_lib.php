@@ -1,5 +1,8 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+require_once PATH_THIRD.'table/celltypes/table_text_cell.php';
+require_once PATH_THIRD.'table/celltypes/table_title_image_cell.php';
+
 class Table_lib {
 
     /**
@@ -31,39 +34,6 @@ class Table_lib {
         }
 
         return $field_name;
-    }
-
-    /**
-     * @todo make this more dynamic! :-P
-     *
-     * @param $row_type content type, ie. text
-     * @param $raw_content the raw content stored
-     */
-    public function parse_cell_content($row_type, $raw_content)
-    {
-        $content_html = $raw_content;
-        if($row_type == 'title_image') {
-            $content_obj = json_decode($raw_content);
-            $content_html = isset($content_obj->title_text) ? '<h2 title="'.$content_obj->title_text.'">'.$content_obj->title_text.'</h2>' : '';
-            if(isset($content_obj->assets_file_id)) {
-                ee()->load->add_package_path(PATH_THIRD.'assets/');
-                require_once PATH_THIRD.'assets/sources/ee/file.ee.php';
-                require_once PATH_THIRD.'assets/helper.php';
-                ee()->load->library('Assets_lib');
-                $assets_file = ee()->assets_lib->get_file_by_id($content_obj->assets_file_id);
-                $assets_helper = new Assets_helper();
-
-                $force_width = 139;
-                $width_ratio = $assets_file->width() / $force_width;
-                $force_height = round($assets_file->height() / $width_ratio);
-
-                $tagdata = '<img width="'.$force_width.'" height="'.$force_height.'" title="'.$content_obj->title_text.'" src="{url}"/>';
-                $content_html .= $assets_helper->parse_file_tag(array($assets_file), $tagdata);
-            }
-        }
-
-        return $content_html;
-
     }
 
     /**
@@ -105,14 +75,26 @@ class Table_lib {
                 while(isset($row['col_'.$i]) && ($col_limit == FALSE || $col_counter < $col_limit)) {
                     $col_counter++;
                     $raw_content = $row['col_'.$i];
-                    $content = $this->parse_cell_content($row_type, $raw_content);
+
+                    $cell = FALSE;
+                    switch($row_type) {
+                        case Table_text_cell::$TYPE:
+                                $cell = new Table_text_cell($row_num, $col_counter, $raw_content);
+                            break;
+
+                        case Table_title_image_cell::$TYPE:
+                                $cell = new Table_title_image_cell($row_num, $col_counter, $raw_content);
+                            break;
+
+                    }
+
                     $col[] =
                         array(
-                            Table_ft::TAG_PREFIX.'col:num' => $col_counter,
-                            Table_ft::TAG_PREFIX.'col:content' => $content,
-                            Table_ft::TAG_PREFIX.'col:content_raw' => $raw_content,
-                            Table_ft::TAG_PREFIX.'col:content:num_words' => str_word_count($raw_content),   // @todo: raw_content = text content, for others this won't make sense?
-                            Table_ft::TAG_PREFIX.'col:content:num_chars' => strlen($raw_content)            // @todo: raw_content = text content, for others this won't make sense?
+                            Table_ft::TAG_PREFIX.'col:num' => $cell->getCol(),
+                            Table_ft::TAG_PREFIX.'col:content' => $cell->getContent(),
+                            Table_ft::TAG_PREFIX.'col:content_raw' => $cell->getRawContent(),
+                            Table_ft::TAG_PREFIX.'col:content:num_words' => $cell->getNumWords(),
+                            Table_ft::TAG_PREFIX.'col:content:num_chars' => $cell->getNumChars()
                         );
 
                     $i++;
