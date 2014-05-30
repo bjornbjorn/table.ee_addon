@@ -139,6 +139,7 @@ class Table_ft extends EE_Fieldtype {
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
         ee()->cp->add_to_head('<script type="text/javascript" src="'.ee()->table_lib->get_theme_url().'js/table.min.js'.'"></script>');
+        ee()->cp->add_to_foot('<script type="text/javascript">$(document).ready(function(e) { var table__table__'.$field_id.' = new Table('.$field_id.');});</script>');
         return ee()->load->view('table_publish_view', $vars, TRUE);
     }
 

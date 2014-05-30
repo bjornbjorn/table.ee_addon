@@ -1,9 +1,9 @@
-<a href="#" class="table__table__add-row">
+<a href="#" class="table__table__add-row" data-field_id="<?php echo $field_id?>">
     <i class="icon-plus-sign-alt"></i> Add row
 </a>
 
 <div style="position:relative; float:left;">
-    <div class="table__table__add-row-dropdown">
+    <div class="table__table__add-row-dropdown" data-field_id="<?php echo $field_id?>">
 
         <ul class="table__table__row-types">
             <li>
@@ -22,7 +22,7 @@
 </div>
 
 
-<a href="#" class="table__table__add-col">
+<a href="#" class="table__table__add-col" data-field_id="<?php echo $field_id?>">
     <i class="icon-plus-sign-alt"></i> Add column
 </a>
 
