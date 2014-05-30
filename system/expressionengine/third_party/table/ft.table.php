@@ -23,6 +23,22 @@ class Table_ft extends EE_Fieldtype {
     }
 
     /**
+     * Make Grid compatible.
+     *
+     * @param $name
+     * @return bool
+     */
+    public function accepts_content_type($name)
+    {
+        return ($name == 'channel' || $name == 'grid');
+    }
+
+    public function grid_display_field($data)
+    {
+        return $this->display_field($data);
+    }
+
+    /**
      * Display the field
      *
      * @param $data

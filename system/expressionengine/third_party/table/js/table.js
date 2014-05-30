@@ -21,6 +21,47 @@ $(document).ready(function(e) {
         return {position: counter, closest: closest};
     };
 
+
+    /**
+     * smart resize function
+     *
+     */
+    (function($,sr){
+
+        // debouncing function from John Hann
+        // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+        var debounce = function (func, threshold, execAsap) {
+            var timeout;
+
+            return function debounced () {
+                var obj = this, args = arguments;
+                function delayed () {
+                    if (!execAsap)
+                        func.apply(obj, args);
+                    timeout = null;
+                }
+
+                if (timeout)
+                    clearTimeout(timeout);
+                else if (execAsap)
+                    func.apply(obj, args);
+
+                timeout = setTimeout(delayed, threshold || 100);
+            };
+        };
+        // smartresize
+        jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+
+    })(jQuery,'smartresize');
+
+
+    $.updateFieldContainerWidth = function() {
+      $('.table__table__container').width(
+          $('#publish').width() - 36
+      );
+    };
+
+
     /**
      * Add a row reoder "flip" to the table + delete icon
      * @param row
@@ -59,7 +100,7 @@ $(document).ready(function(e) {
     };
 
     $.getAssetsImgThumb = function(file_id) {
-        var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=50x50&hash='+Math.random();
+        var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=100x100&hash='+Math.random();
         return '<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>';
     };
 
@@ -426,7 +467,7 @@ $(document).ready(function(e) {
     var the_table = $.getTable();
 
     var cell_width = 200;
-    var cell_height = 100;
+    var cell_height = 150;
     var num_cols = the_table.data('init-num-cols');
     var num_rows = the_table.data('init-num-rows');
     var row_positions = [0];
@@ -942,5 +983,9 @@ $(document).ready(function(e) {
         return false;
     });
 
+
+
+    $.updateFieldContainerWidth();
+    $(window).smartresize($.updateFieldContainerWidth);
 
 });

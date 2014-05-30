@@ -44,7 +44,7 @@ class Table_lib {
         $content_html = $raw_content;
         if($row_type == 'title_image') {
             $content_obj = json_decode($raw_content);
-            $content_html = '<h2>'.$content_obj->title_text.'</h2>';
+            $content_html = isset($content_obj->title_text) ? '<h2 title="'.$content_obj->title_text.'">'.$content_obj->title_text.'</h2>' : '';
             if(isset($content_obj->assets_file_id)) {
                 ee()->load->add_package_path(PATH_THIRD.'assets/');
                 require_once PATH_THIRD.'assets/sources/ee/file.ee.php';
@@ -52,7 +52,12 @@ class Table_lib {
                 ee()->load->library('Assets_lib');
                 $assets_file = ee()->assets_lib->get_file_by_id($content_obj->assets_file_id);
                 $assets_helper = new Assets_helper();
-                $tagdata = '<img src="{url}"/>';
+
+                $force_width = 139;
+                $width_ratio = $assets_file->width() / $force_width;
+                $force_height = round($assets_file->height() / $width_ratio);
+
+                $tagdata = '<img width="'.$force_width.'" height="'.$force_height.'" title="'.$content_obj->title_text.'" src="{url}"/>';
                 $content_html .= $assets_helper->parse_file_tag(array($assets_file), $tagdata);
             }
         }
@@ -89,7 +94,9 @@ class Table_lib {
                         array(
                             Table_ft::TAG_PREFIX.'col:num' => $i,
                             Table_ft::TAG_PREFIX.'col:content' => $content,
-                            Table_ft::TAG_PREFIX.'col:content_raw' => $raw_content
+                            Table_ft::TAG_PREFIX.'col:content_raw' => $raw_content,
+                            Table_ft::TAG_PREFIX.'col:content:num_words' => str_word_count($raw_content),   // @todo: raw_content = text content, for others this won't make sense?
+                            Table_ft::TAG_PREFIX.'col:content:num_chars' => strlen($raw_content)            // @todo: raw_content = text content, for others this won't make sense?
                         );
 
                     $i++;
