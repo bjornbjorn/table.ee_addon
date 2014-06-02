@@ -37,6 +37,8 @@
 
     (function($){
 
+        console.log("Creating Table");
+
         Table = function(field_id) {
 
             var obj = $(this);
@@ -108,10 +110,7 @@
                 return num_cols * cell_width;
             };
 
-            obj.getAssetsImgThumb = function(file_id) {
-                var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=100x100&hash='+Math.random();
-                return '<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>';
-            };
+
 
 
             /**
@@ -164,7 +163,8 @@
                                 if(!cell_inited) {
 
                                     var text_value = current_cell.data('init-cell-value');
-                                    var cell_content = obj.getNewTextCellContent(row, col, text_value);
+
+                                    var cell_content = $.getNewTextCellContent(field_id, row, col, text_value);
                                     current_cell.attr('inited', 1);
                                     current_cell.data('inited', 1);
                                     current_cell.html(cell_content);
@@ -181,7 +181,7 @@
 
                                     var init_cell_value = current_cell.data('init-cell-value');
 
-                                    var title_image_cell_content = obj.getNewTitleImageCellContent(row, col, init_cell_value.assets_file_id, init_cell_value.title_text);
+                                    var title_image_cell_content = $.getNewTitleImageCellContent(field_id, row, col, init_cell_value.assets_file_id, init_cell_value.title_text);
                                     current_cell.attr('inited', 1);
                                     current_cell.data('inited', 1);
                                     current_cell.html(title_image_cell_content);
@@ -376,43 +376,6 @@
                 }
             };
 
-            /**
-             * Get HTML for a text cell
-             *
-             * @param row_num
-             * @param col_num
-             * @returns {string}
-             */
-            obj.getNewTextCellContent = function(row_num, col_num, text_value) {
-
-                if(text_value !== undefined) {
-                    return '<textarea>'+text_value+'</textarea>';
-                }
-                else {
-                    return '<textarea></textarea>';
-                }
-            };
-
-            /**
-             * Get HTML for a title image cell
-             *
-             * @param row_num
-             * @param col_num
-             * @returns {string}
-             */
-            obj.getNewTitleImageCellContent = function(row_num, col_num, assets_file_id, title_text) {
-
-                var html = '<input type="hidden"><input type="text" value="'+(title_text !== undefined ? title_text : '')+'">';
-
-                if(assets_file_id === undefined) {
-                    html += '<div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button" data-field_id="'+field_id+'">Add image</a></div><div class="table__table__cell-remove-image-controls" style="display:none"><div class="table__table__cell-thumbnail"></div><a href="#" class="table__table__cell__remove-image-button" data-field_id="'+field_id+'">Remove image</a></div>';
-                } else {
-                    html += '<div class="table__table__cell-add-image-controls" style="display:none"><a href="#" class="table__table__cell__add-image-button" data-field_id="'+field_id+'">Add image</a></div><div class="table__table__cell-remove-image-controls"><div class="table__table__cell-thumbnail">'+ obj.getAssetsImgThumb(assets_file_id) +'</div><a href="#" class="table__table__cell__remove-image-button" data-field_id="'+field_id+'">Remove image</a></div>';
-                }
-
-                return html;
-            };
-
 
             /**
              * Add a standard Text row to the table
@@ -443,10 +406,10 @@
                     var cell_content = '';
                     switch(row_type) {
                         case 'title_image':
-                            cell_content = obj.getNewTitleImageCellContent(new_row_num, new_col_num);
+                            cell_content = $.getNewTitleImageCellContent(new_row_num, new_col_num);
                             break;
                         case 'text':
-                            cell_content = obj.getNewTextCellContent(new_row_num, new_col_num);
+                            cell_content = $.getNewTextCellContent(new_row_num, new_col_num);
                             break;
                     }
 
@@ -509,7 +472,6 @@
                 if(y === 0) {
                     col_positions.push(x*cell_width);            // as long as we are on first row, store col positions
                     obj.addColActions(x+1);
-                    console.log("adding col actions");
                 }
 
                 x++;
@@ -591,7 +553,7 @@
                         if(files.length > 0) {
                             add_image_controls_div.hide();
                             var file_id = files[0].id;
-                            var img_tag = obj.getAssetsImgThumb(file_id);
+                            var img_tag = $.getAssetsImgThumb(file_id);
                             thumb_image_div.html(img_tag);
                             remove_image_controls_div.fadeIn();
                         }
@@ -640,10 +602,10 @@
                     var cell_content = '';
                     switch(row_type) {
                         case 'title_image':
-                            cell_content = obj.getNewTitleImageCellContent(new_row_num, new_col_num);
+                            cell_content = $.getNewTitleImageCellContent(field_id, new_row_num, new_col_num);
                             break;
                         case 'text':
-                            cell_content = obj.getNewTextCellContent(new_row_num, new_col_num);
+                            cell_content = $.getNewTextCellContent(field_id, new_row_num, new_col_num);
                             break;
                     }
                     current_table.append(

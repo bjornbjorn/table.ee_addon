@@ -125,7 +125,6 @@ class Table_ft extends EE_Fieldtype {
             }
         }
 
-
         // Make sure that Assets is installed
         if (array_key_exists('assets', $this->EE->addons->get_installed()))
         {
@@ -138,8 +137,9 @@ class Table_ft extends EE_Fieldtype {
         ee()->load->library('table_lib');
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
+        $dynamic_js = ee()->load->view('table_dynamic_js', $vars, TRUE);
+        ee()->cp->add_to_head($dynamic_js);
         ee()->cp->add_to_head('<script type="text/javascript" src="'.ee()->table_lib->get_theme_url().'js/table.min.js'.'"></script>');
-        ee()->cp->add_to_foot('<script type="text/javascript">$(document).ready(function(e) { var table__table__'.$field_id.' = new Table('.$field_id.');});</script>');
         return ee()->load->view('table_publish_view', $vars, TRUE);
     }
 
@@ -357,7 +357,7 @@ class Table_ft extends EE_Fieldtype {
             ee()->load->library('table_lib');
             $field_name = ee()->table_lib->get_field_name($this->id());             // @todo: fix this when EE implements a sensible way to get field_name everywhere! (right now this->name() returns different results in each hook!)
             if($field_name) {
-                    $tagdata = ee()->table_lib->parse_tagdata($entry_id, $field_name, $tagdata, $params);
+                    $tagdata = ee()->table_lib->parse_tagdata($entry_id, $this->id(), $field_name, $tagdata, $params);
                 } else {
                     $tagdata = '';
             }

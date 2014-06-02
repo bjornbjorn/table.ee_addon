@@ -14,7 +14,7 @@ class Table_title_image_cell extends Table_cell {
 
     public static $TYPE = 'title_image';
 
-    public function getContent()
+    public function get_cell_frontend_content()
     {
         $content_obj = json_decode($this->raw_content);
         $content_html = isset($content_obj->title_text) ? '<h2 title="'.$content_obj->title_text.'">'.$content_obj->title_text.'</h2>' : '';

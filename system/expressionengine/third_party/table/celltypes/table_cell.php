@@ -25,14 +25,32 @@ class Table_cell {
     protected $raw_content;
 
     /**
+     * @var the id of the field this cell belongs to
+     */
+    protected $field_id;
+
+    /**
      * @var the cell type
      */
     public static $TYPE;
 
-    public function __construct($row, $col, $raw_content) {
+    public function __construct($field_id, $row, $col, $raw_content) {
+        $this->field_id = $field_id;
         $this->row = $row;
         $this->col = $col;
         $this->raw_content = $raw_content;
+    }
+
+    public function __get($name) {
+        if(isset($this->$name)) {
+            return $this->$name;
+        }
+    }
+
+    public function __set($name, $value) {
+        if(isset($this->$name)) {
+            return $this->$name;
+        }
     }
 
     /**
@@ -40,27 +58,23 @@ class Table_cell {
      *
      * @return string/HTML
      */
-    public function getContent() {
+    public function get_cell_frontend_content() {
         return $this->raw_content;
     }
 
     /**
-     * Get raw content for this cell
-     * @return string/JSON
+     * Get HTML for table fieldtype cell
      */
-    public function getRawContent() {
-        return $this->raw_content;
+    public function display_cell() {
+        return 'Not implemented';
     }
-
-    public function getCol() { return $this->col; }
-    public function getRow() { return $this->row; }
 
     /**
      * Get number of characters in cell
      *
      * @return int
      */
-    public function getNumChars()
+    public function get_num_chars()
     {
         return 0;
     }
@@ -70,7 +84,7 @@ class Table_cell {
      *
      * @return int
      */
-    public function getNumWords()
+    public function get_num_words()
     {
         return 0;
     }

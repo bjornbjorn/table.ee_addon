@@ -40,10 +40,11 @@ class Table_lib {
      * Parse tagdata (called form channel:entries)
      *
      * @param $entry_id entry_id
+     * @param $field_id the id of the field
      * @param $field_name the field name (ie. blog_table)
      * @param $tagdata the tagdata (content inside the tag pair)
      */
-    public function parse_tagdata($entry_id, $field_name, $tagdata, $params)
+    public function parse_tagdata($entry_id, $field_id, $field_name, $tagdata, $params)
     {
         $row_limit = isset($params['row_limit']) ? $params['row_limit'] : FALSE;
         $row_offset = isset($params['row_offset']) ? $params['row_offset'] : FALSE;
@@ -79,22 +80,22 @@ class Table_lib {
                     $cell = FALSE;
                     switch($row_type) {
                         case Table_text_cell::$TYPE:
-                                $cell = new Table_text_cell($row_num, $col_counter, $raw_content);
+                                $cell = new Table_text_cell($row_num, $field_id, $col_counter, $raw_content);
                             break;
 
                         case Table_title_image_cell::$TYPE:
-                                $cell = new Table_title_image_cell($row_num, $col_counter, $raw_content);
+                                $cell = new Table_title_image_cell($row_num, $field_id, $col_counter, $raw_content);
                             break;
 
                     }
 
                     $col[] =
                         array(
-                            Table_ft::TAG_PREFIX.'col:num' => $cell->getCol(),
-                            Table_ft::TAG_PREFIX.'col:content' => $cell->getContent(),
-                            Table_ft::TAG_PREFIX.'col:content_raw' => $cell->getRawContent(),
-                            Table_ft::TAG_PREFIX.'col:content:num_words' => $cell->getNumWords(),
-                            Table_ft::TAG_PREFIX.'col:content:num_chars' => $cell->getNumChars()
+                            Table_ft::TAG_PREFIX.'col:num' => $cell->col,
+                            Table_ft::TAG_PREFIX.'col:content' => $cell->get_cell_frontend_content(),
+                            Table_ft::TAG_PREFIX.'col:content_raw' => $cell->raw_content,
+                            Table_ft::TAG_PREFIX.'col:content:num_words' => $cell->get_num_words(),
+                            Table_ft::TAG_PREFIX.'col:content:num_chars' => $cell->get_num_chars()
                         );
 
                     $i++;

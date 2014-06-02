@@ -19,13 +19,13 @@ class Table_text_cell extends Table_cell {
      *
      * @return int
      */
-    public function getNumChars()
+    public function get_num_chars()
     {
         return strlen($this->raw_content);
     }
 
-
-    public function getNumWords() {
+    public function get_num_words() {
         return str_word_count($this->raw_content);
     }
+
 }
