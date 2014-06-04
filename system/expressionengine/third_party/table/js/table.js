@@ -37,9 +37,7 @@
 
     (function($){
 
-        console.log("Creating Table");
-
-        Table = function(field_id, factory) {
+        Table = function(field_id, table_tab_index, factory) {
 
             var obj = $(this);
             var current_table = $('#table__table__'+field_id);
@@ -111,34 +109,6 @@
             };
 
 
-
-
-            /**
-             * Update the cell content data for a Title/Image cell
-             *
-             * @param row
-             * @param col
-             */
-            obj.updateTitleImageCellData = function(row, col, cell_data_name, cell_ref) {
-
-                if(cell_data_name === undefined) {
-                    cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']';
-                }
-                if(typeof cell_ref == "undefined") {
-                    cell_ref = $('#table__table__'+field_id+' .table__cell[data-row="'+row+'"][data-col="'+col+'"]');
-                }
-
-                var hidden_input = cell_ref.find('input[type=hidden]');
-                hidden_input.attr('name', cell_data_name);
-
-                // update the value of the hidden with the current values of the content
-                var assets_file_id = cell_ref.find('img').data('assets_file_id');
-                var title_text = cell_ref.find('input[type=text]').val();
-
-                hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id, title_text: title_text} ));
-
-            };
-
             /**
              * Update all table cells w/correct tabindex etc. - this is needed after
              * dragging around rows/cols and adding/removing rows/cols
@@ -148,7 +118,9 @@
                 /**
                  * Update table cell tabs indexes
                  */
-                var tabindex = 0;
+                var tabindex_offset = (table_tab_index * 200);
+
+                var tabindex = tabindex_offset;
                 for(var row=1; row < (num_rows+1); row++) {
                     for(var col=1; col < (num_cols+1); col++) {
                         tabindex++;
@@ -157,40 +129,21 @@
                         var cell_data_name = 'table_cell_'+field_id+'['+row+']['+col+']['+rowtype+']';
                         var cell_inited = current_cell.data('inited') !== 0;
 
-                        switch(rowtype) {
-                            case 'text':
-
-                                if(!cell_inited) {
-
-                                    var text_value = current_cell.data('init-cell-value');
-                                    var cell_content = factory.getNewCellContent(rowtype, field_id, row, col, {text:text_value} );
-                                    current_cell.attr('inited', 1);
-                                    current_cell.data('inited', 1);
-                                    current_cell.html(cell_content);
-                                }
-
-                                var current_cell_first_child =  current_cell.children().first();
-                                current_cell_first_child.attr('tabindex', tabindex);
-                                current_cell_first_child.attr('name', cell_data_name);
-                                break;
-
-                            case 'title_image':
-
-                                if(!cell_inited) {
-
-                                    var init_cell_value = current_cell.data('init-cell-value');
-
-                                    var title_image_cell_content = factory.getNewCellContent(rowtype, field_id, row, col, init_cell_value);
-                                    current_cell.attr('inited', 1);
-                                    current_cell.data('inited', 1);
-                                    current_cell.html(title_image_cell_content);
-                                }
-
-                                obj.updateTitleImageCellData(row, col, cell_data_name, current_cell);
-                                break;
+                        /**
+                         * If cell hasn't been inited we do that first
+                         */
+                        if(!cell_inited) {
+                            var init_data = current_cell.data('init-cell-value');
+                            var cell_content = factory.getNewCellContent(rowtype, field_id, row, col, init_data );
+                            current_cell.attr('inited', 1);
+                            current_cell.data('inited', 1);
+                            current_cell.html(cell_content);
                         }
 
-
+                        /**
+                         * Call TableCellFactory's update method to let the cells update itself
+                         */
+                        factory.updateCellContent(rowtype, row, col, tabindex, cell_data_name, current_cell);
                     }
                 }
             };

@@ -5,6 +5,8 @@
      */
     if(!TableCellFactory) {
 
+        var table_tab_index = 0;
+
 <?php
 foreach($factories as $factory) {
     echo $factory;
@@ -26,6 +28,10 @@ foreach($factories as $factory) {
                 return window['factory_'+cell_type+'_cell'].makeCell(field_id, row_num, col_num, value_obj);
             },
 
+            updateCellContent: function(cell_type, row_num, col_num, tabindex, element_name, cell_ref) {
+                return window['factory_'+cell_type+'_cell'].updateCell(row_num, col_num, tabindex, element_name, cell_ref);
+            },
+
             /**
              * Get an Assets thumbnail img tag
              *
@@ -41,6 +47,8 @@ foreach($factories as $factory) {
     }
 
     $(document).ready(
-        function(e) { var table__table__<?php echo $field_id?> = new Table(<?php echo $field_id?>, TableCellFactory);}
+        function(e) {
+            table_tab_index++;
+            var table__table__<?php echo $field_id?> = new Table(<?php echo $field_id?>, table_tab_index, TableCellFactory);}
     );
 </script>

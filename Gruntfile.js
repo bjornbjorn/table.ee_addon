@@ -5,7 +5,13 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         jshint: {
-            all: ['Gruntfile.js', 'system/expressionengine/third_party/table/js/*.js']
+            all: ['Gruntfile.js', 'system/expressionengine/third_party/table/**/*.js']
+        },
+
+        phplint: {
+            all: [
+                'system/expressionengine/third_party/table/**/*.php'
+            ]
         },
 
         sass: {                              // Task
@@ -47,6 +53,10 @@ module.exports = function(grunt) {
             options: {
                 atBegin: true
             },
+            php: {
+                files: ['system/expressionengine/third_party/table/**/*.php'],
+                tasks: ['phplint']
+            },
             scripts: {
                 files: ['system/expressionengine/third_party/table/js/*.js'],
                 tasks: ['jshint','uglify']
@@ -64,5 +74,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-phplint');
     grunt.loadNpmTasks('grunt-conventional-changelog');
 };
