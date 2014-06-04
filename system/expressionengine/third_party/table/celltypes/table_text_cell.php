@@ -3,16 +3,17 @@
 require_once 'table_cell.php';
 
 /**
- * Created by PhpStorm.
- * User: bjorn
- * Date: 30/05/14
- * Time: 13:27
+ * A Standard text cell
  */
 
 
 class Table_text_cell extends Table_cell {
 
     public static $TYPE = 'text';
+
+    public static $TYPE_HUMAN = 'Text';
+
+    public static $ICON_CSS_CLASS = 'icon-align-left';
 
     /**
      * Get number of characters in text content
@@ -28,3 +29,5 @@ class Table_text_cell extends Table_cell {
         return str_word_count($this->raw_content);
     }
 }
+
+$celltypes[] = new Table_text_cell();

@@ -53,18 +53,18 @@ module.exports = function(grunt) {
             options: {
                 atBegin: true
             },
-            php: {
-                files: ['system/expressionengine/third_party/table/**/*.php'],
-                tasks: ['phplint']
+            css: {
+                files: 'system/expressionengine/third_party/table/sass/*/**.scss',
+                tasks: ['sass']
             },
             scripts: {
                 files: ['system/expressionengine/third_party/table/js/*.js'],
                 tasks: ['jshint','uglify']
-            },
-            css: {
-                files: 'system/expressionengine/third_party/table/sass/*/**.scss',
-                tasks: ['sass']
-            }
+            }//
+            //php: {
+            //    files: ['system/expressionengine/third_party/table/**/*.php'],
+            //    tasks: ['phplint']
+            //}
         },
 
 

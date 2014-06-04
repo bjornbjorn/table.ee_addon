@@ -1,3 +1,5 @@
+<div class="table__table__outer-container">
+
 <a href="#" class="table__table__add-row" data-field_id="<?php echo $field_id?>">
     <i class="icon-plus-sign-alt"></i> Add row
 </a>
@@ -6,16 +8,15 @@
     <div class="table__table__add-row-dropdown" data-field_id="<?php echo $field_id?>">
 
         <ul class="table__table__row-types">
-            <li>
-                <a href="#" class="table__table__add-text-row">
-                    <i class="icon-align-left"></i> Text
+            <?php
+            foreach($celltypes as $celltype) {
+                ?><li>
+                <a href="#" class="table__table__add-row" data-celltype="<?php echo $celltype::$TYPE?>">
+                    <i class="<?php echo $celltype::$ICON_CSS_CLASS?>"></i> <?php echo $celltype::$TYPE_HUMAN ?>
                 </a>
-            </li>
-            <li>
-                <a href="#" class="table__table__add-title-image-row">
-                    <i class="icon-picture"></i> Header (title / image)
-                </a>
-            </li>
+            </li><?php
+            }   // eof foreach celltypes
+            ?>
         </ul>
     </div>
 
@@ -52,5 +53,7 @@
         }
         ?>
     </div>
+
+</div>
 
 </div>

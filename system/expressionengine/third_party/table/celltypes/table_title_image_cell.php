@@ -3,16 +3,17 @@
 require_once 'table_cell.php';
 
 /**
- * Created by PhpStorm.
- * User: bjorn
- * Date: 30/05/14
- * Time: 13:27
+ * Title / Image cell
  */
 
 
 class Table_title_image_cell extends Table_cell {
 
     public static $TYPE = 'title_image';
+
+    public static $TYPE_HUMAN = 'Title + Image';
+
+    public static $ICON_CSS_CLASS = 'icon-picture';
 
     public function get_cell_frontend_content()
     {
@@ -37,3 +38,5 @@ class Table_title_image_cell extends Table_cell {
     }
 
 }
+
+$celltypes[] = new Table_title_image_cell();

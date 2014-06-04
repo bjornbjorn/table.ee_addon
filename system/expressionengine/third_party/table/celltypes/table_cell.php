@@ -10,29 +10,39 @@
 class Table_cell {
 
     /**
-     * @var row number (1 .. number of rows in table)
+     * @var int row number (1 .. number of rows in table)
      */
     protected $row;
 
     /**
-     * @var column number (1 .. number of columns in table)
+     * @var int column number (1 .. number of columns in table)
      */
     protected $col;
 
     /**
-     * @var the raw content (may be in JSON format)
+     * @var string the raw content (may be in JSON format)
      */
     protected $raw_content;
 
     /**
-     * @var the id of the field this cell belongs to
+     * @var string the id of the field this cell belongs to
      */
     protected $field_id;
 
     /**
-     * @var the cell type
+     * @var string the cell type
      */
-    public static $TYPE;
+    public static $TYPE = FALSE;
+
+    /**
+     * @var string a human readable version of $TYPE
+     */
+    public static $TYPE_HUMAN = FALSE;
+
+    /**
+     * @var string css class to add to the <i> (fontawesome)c
+     */
+    public static $ICON_CSS_CLASS = FALSE;
 
     public function __construct($field_id=FALSE, $row=FALSE, $col=FALSE, $raw_content=FALSE) {
         $this->field_id = $field_id;

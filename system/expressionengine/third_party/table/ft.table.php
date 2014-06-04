@@ -19,6 +19,7 @@ class Table_ft extends EE_Fieldtype {
     public function __construct()
     {
         parent::__construct();
+        ee()->lang->loadfile('table');
     }
 
     /**
@@ -53,6 +54,7 @@ class Table_ft extends EE_Fieldtype {
             'table_rows' => FALSE,
             'table_num_rows' => 0,
             'table_num_cols' => 0,
+            'celltypes' => ee()->table_lib->get_celltypes(),
         );
 
         $field_id = $this->field_id;
@@ -134,8 +136,6 @@ class Table_ft extends EE_Fieldtype {
             $assets_helper->include_sheet_resources();
         }
 
-        ee()->load->library('table_lib');
-
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
 
         $dynamic_js_vars = array(
@@ -171,6 +171,54 @@ class Table_ft extends EE_Fieldtype {
             ee()->load->dbforge();
             ee()->dbforge->rename_table($old_table_name, $table_name);
         }
+    }
+
+
+    /**
+     * Display individual settings
+     *
+     * @return string|void
+     */
+    public function display_settings($data)
+    {
+        ee()->load->library('table_lib');
+        ee()->table_lib->load_cells();
+
+        ee()->table->set_heading(array(
+            'data' => lang('table_options'),
+            'colspan' => 2
+        ));
+
+        $celltypes = ee()->table_lib->get_celltypes();
+        foreach($celltypes as $celltype) {
+            // Minimum rows field
+            ee()->table->add_row(
+                form_checkbox(array(
+                    'name' => 'available_celltypes[]',
+                    'value' => $celltype::$TYPE,
+                    'checked' => isset($data['available_celltypes']) && is_array($data['available_celltypes']) && in_array($celltype::$TYPE, $data['available_celltypes'])
+                    //'class' => 'grid_input_text_small'
+                )).
+                '<div class="grid_input_label_group">'.
+                form_label($celltype::$TYPE_HUMAN, 'grid_min_rows').
+                '<br><i class="instruction_text">'.lang('grid_min_rows_desc').'</i></div>'.
+                '<div class="grid_validation_error">'.form_error('grid_max_rows').'</div>'
+            );
+
+        }
+
+
+        return ee()->table->generate();
+    }
+
+
+    public function save_settings($data)
+    {
+        $available_celltypes = ee()->input->post('available_celltypes');
+
+        return array(
+            'available_celltypes' => $available_celltypes,
+        );
     }
 
 
@@ -372,118 +420,5 @@ class Table_ft extends EE_Fieldtype {
         return $tagdata;
     }
 
-
-    // --------------------------------------------------------------------
-
-   /* public function display_settings($data)
-    {
-        $field_id = (int) $this->id();
-
-        ee()->table->set_heading(array(
-            'data' => lang('table_options'),
-            'colspan' => 2
-        ));
-
-        // Minimum rows field
-        ee()->table->add_row(
-            form_input(array(
-                'name' => 'table_default_rows',
-                'id' => 'table_default_rows',
-                'value' => set_value('table_default_rows', (isset($data['table_default_rows'])) ? $data['table_default_rows'] : 0),
-                'class' => 'grid_input_text_small'
-            )).
-            '<div class="grid_input_label_group">'.
-            form_label(lang('table_default_rows'), 'table_default_rows').
-            '<br><i class="instruction_text">'.lang('table_default_rows_desc').'</i></div>'.
-            '<div class="grid_validation_error">'.form_error('table_default_rows').'</div>'
-        );
-
-        // Maximum rows field
-        ee()->table->add_row(
-            form_input(array(
-                'name' => 'grid_max_rows',
-                'id' => 'grid_max_rows',
-                'value' => set_value('grid_max_rows', (isset($data['grid_max_rows'])) ? $data['grid_max_rows'] : ''),
-                'class' => 'grid_input_text_small'
-            )).
-            '<div class="grid_input_label_group">'.
-            form_label(lang('grid_max_rows'), 'grid_max_rows').
-            '<br><i class="instruction_text">'.lang('grid_max_rows_desc').'</i></div>'.
-            '<div class="grid_validation_error">'.form_error('grid_max_rows').'</div>'
-        );
-
-        // Settings header
-        $settings_html = form_label(lang('grid_config')).'<br>'.
-            '<i class="instruction_text">'.lang('grid_config_desc').'</i>';
-
-        // Settings to initialize JS with
-        $settings = array();
-
-        // If we're coming from a form validation error, load the previous
-        // screen's HTML for the Grid field for easy repopulation
-        if ($grid_html = ee()->input->post('grid_html'))
-        {
-            $settings_html .= form_error('grid_validation');
-            $settings_html .= $grid_html;
-
-            // Array of field names that had validation errors, we'll highlight them
-            if ($error_fields = ee()->session->cache(__CLASS__, 'grid_settings_field_errors'))
-            {
-                $settings['error_fields'] = $error_fields;
-            }
-        }
-        // Otherwise load settings from the database
-        else
-        {
-            $this->_load_grid_lib();
-
-            $vars = array();
-
-            // Fresh settings forms ready to be used for added columns
-            $vars['settings_forms'] = array();
-            foreach (ee()->grid_lib->get_grid_fieldtypes() as $field_name => $data)
-            {
-                $vars['settings_forms'][$field_name] = ee()->grid_lib->get_settings_form($field_name);
-            }
-
-            // Gather columns for current field
-            $vars['columns'] = array();
-
-            if ( ! empty($field_id))
-            {
-                $columns = ee()->grid_model->get_columns_for_field($field_id, $this->content_type());
-
-                foreach ($columns as $column)
-                {
-                    $vars['columns'][] = ee()->grid_lib->get_column_view($column);
-                }
-            }
-
-            // Will be our template for newly-created columns
-            $vars['blank_col'] = ee()->grid_lib->get_column_view();
-
-            if (empty($vars['columns']))
-            {
-                $vars['columns'][] = $vars['blank_col'];
-            }
-
-            $settings_html .= ee()->load->view('settings', $vars, TRUE);
-        }
-
-        // The big column configuration row, generated from the settings view
-        ee()->table->add_row($settings_html);
-
-        ee()->cp->add_to_head(ee()->view->head_link('css/grid.css'));
-
-        ee()->cp->add_js_script('plugin', 'ee_url_title');
-        ee()->cp->add_js_script('ui', 'sortable');
-        ee()->cp->add_js_script('file', 'cp/sort_helper');
-        ee()->cp->add_js_script('file', 'cp/grid');
-
-        ee()->javascript->output('EE.grid_settings('.json_encode($settings).');');
-
-        return ee()->table->generate();
-    }
-   */
 
 }

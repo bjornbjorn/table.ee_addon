@@ -334,10 +334,6 @@
              */
             obj.addNewTableRow = function(row_type) {
 
-                if(row_type === undefined) {
-                    row_type = 'text';
-                }
-
                 current_table.css('height', obj.getTableHeight() + cell_height);
                 var new_row_num = num_rows+1;
                 var new_row_position = (num_rows*cell_height);
@@ -463,21 +459,18 @@
                 }
             });
 
-
-            $('.table__table__add-row-dropdown[data-field_id='+field_id+'] .table__table__add-text-row').on('click', function(e) {
+            /**
+             * Add row dropdown handler
+             */
+            $('.table__table__add-row-dropdown[data-field_id='+field_id+'] .table__table__add-row').on('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+
+                var celltype = $(this).data('celltype');
+
                 $('.table__table__add-row-dropdown[data-field_id='+field_id+']').hide();
 
-                obj.addNewTableRow();
-            });
-
-            $('.table__table__add-row-dropdown[data-field_id='+field_id+'] .table__table__add-title-image-row').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                $('.table__table__add-row-dropdown[data-field_id='+field_id+']').hide();
-
-                obj.addNewTableRow('title_image');
+                obj.addNewTableRow(celltype);
             });
 
             $(document).on('click', '.table__table__cell__add-image-button[data-field_id='+field_id+']', function(e) {

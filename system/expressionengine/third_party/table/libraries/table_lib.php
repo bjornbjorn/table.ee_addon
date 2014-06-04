@@ -2,35 +2,42 @@
 
 class Table_lib {
 
+    private $cells_loaded = FALSE;
     protected $js_factories;
+    protected $celltypes;
 
     /**
      * Load all available cells in celltypes directory
      */
     public function load_cells() {
 
-        /**
-         * Require celltypes PHP files + Fetch cell factories from the js
-         */
-        $factories = array();
-        $celltypes_dir = PATH_THIRD.'/table/celltypes/';
-        if ($handle = opendir($celltypes_dir)) {
-            while (false !== ($file = readdir($handle)))
-            {
-                $ext = strtolower(substr($file, strrpos($file, '.') + 1));
-                if ($file != "." && $file != "..")
+        if(!$this->cells_loaded) {
+            $this->cells_loaded = TRUE;
+            /**
+             * Require celltypes PHP files + Fetch cell factories from the js
+             */
+            $factories = array();
+            $celltypes_dir = PATH_THIRD.'/table/celltypes/';
+            $celltypes = array();
+            if ($handle = opendir($celltypes_dir)) {
+                while (false !== ($file = readdir($handle)))
                 {
-                    if($ext == 'js') {
-                        $factories[] = file_get_contents($celltypes_dir.$file);
-                    } else if($ext == 'php') {
-                        require_once($celltypes_dir.$file);
+                    $ext = strtolower(substr($file, strrpos($file, '.') + 1));
+                    if ($file != "." && $file != "..")
+                    {
+                        if($ext == 'js') {
+                            $factories[] = file_get_contents($celltypes_dir.$file);
+                        } else if($ext == 'php') {
+                            require_once($celltypes_dir.$file);
+                        }
                     }
                 }
+                closedir($handle);
             }
-            closedir($handle);
-        }
 
-        $this->js_factories = $factories;
+            $this->celltypes = $celltypes;
+            $this->js_factories = $factories;
+        }
     }
 
     /**
@@ -40,6 +47,15 @@ class Table_lib {
      */
     public function get_js_cell_factories() {
         return $this->js_factories;
+    }
+
+    /**
+     * Get array of celltype objects
+     *
+     * @return array
+     */
+    public function get_celltypes() {
+        return $this->celltypes;
     }
 
     /**

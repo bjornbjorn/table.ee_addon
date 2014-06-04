@@ -1,13 +1,13 @@
 @import "icons";
 @import "arrows";
 @import "mixins";
-@import "rowtypes/text";
-@import "rowtypes/title_image";
+@import "celltypes/text";
+@import "celltypes/title_image";
 
 /* apply a natural box layout model to all elements */
-*, *:before, *:after {
+/**, *:before, *:after {
   -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
-}
+}*/
 
 /**
  * Add row / col buttons
@@ -15,7 +15,7 @@
 a.table__table__add-row,
 a.table__table__add-col
 {
-    @include button();
+  @include button();
 }
 
 /**
@@ -49,6 +49,7 @@ ul.table__table__row-types {
       text-decoration: none;
       display: block;
       padding: 5px;
+      margin:0;
       @include vendor('border-radius', 2px);
       background-color: #f5f6f5;
 
