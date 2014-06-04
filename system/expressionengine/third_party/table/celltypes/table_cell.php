@@ -34,7 +34,7 @@ class Table_cell {
      */
     public static $TYPE;
 
-    public function __construct($field_id, $row, $col, $raw_content) {
+    public function __construct($field_id=FALSE, $row=FALSE, $col=FALSE, $raw_content=FALSE) {
         $this->field_id = $field_id;
         $this->row = $row;
         $this->col = $col;

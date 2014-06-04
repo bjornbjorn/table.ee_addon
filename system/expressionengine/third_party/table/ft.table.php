@@ -1,6 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-
 /**
  * ExpressionEngine Table Fieldtype
  *
@@ -47,6 +46,7 @@ class Table_ft extends EE_Fieldtype {
     public function display_field($data)
     {
         ee()->load->library('table_lib');
+        ee()->table_lib->load_cells();
 
         $vars = array(
             'field_id' => $this->field_id,
@@ -137,7 +137,13 @@ class Table_ft extends EE_Fieldtype {
         ee()->load->library('table_lib');
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
-        $dynamic_js = ee()->load->view('table_dynamic_js', $vars, TRUE);
+
+        $dynamic_js_vars = array(
+            'field_id' => $field_id,
+            'factories' => ee()->table_lib->get_js_cell_factories(),
+        );
+
+        $dynamic_js = ee()->load->view('table_dynamic_js', $dynamic_js_vars, TRUE);
         ee()->cp->add_to_head($dynamic_js);
         ee()->cp->add_to_head('<script type="text/javascript" src="'.ee()->table_lib->get_theme_url().'js/table.min.js'.'"></script>');
         return ee()->load->view('table_publish_view', $vars, TRUE);

@@ -1,9 +1,46 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once PATH_THIRD.'table/celltypes/table_text_cell.php';
-require_once PATH_THIRD.'table/celltypes/table_title_image_cell.php';
-
 class Table_lib {
+
+    protected $js_factories;
+
+    /**
+     * Load all available cells in celltypes directory
+     */
+    public function load_cells() {
+
+        /**
+         * Require celltypes PHP files + Fetch cell factories from the js
+         */
+        $factories = array();
+        $celltypes_dir = PATH_THIRD.'/table/celltypes/';
+        if ($handle = opendir($celltypes_dir)) {
+            while (false !== ($file = readdir($handle)))
+            {
+                $ext = strtolower(substr($file, strrpos($file, '.') + 1));
+                if ($file != "." && $file != "..")
+                {
+                    if($ext == 'js') {
+                        $factories[] = file_get_contents($celltypes_dir.$file);
+                    } else if($ext == 'php') {
+                        require_once($celltypes_dir.$file);
+                    }
+                }
+            }
+            closedir($handle);
+        }
+
+        $this->js_factories = $factories;
+    }
+
+    /**
+     * Get js code for the cell factories as an array of js methods
+     *
+     * @return array
+     */
+    public function get_js_cell_factories() {
+        return $this->js_factories;
+    }
 
     /**
      * Get the theme folder url

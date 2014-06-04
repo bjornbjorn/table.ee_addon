@@ -27,5 +27,4 @@ class Table_text_cell extends Table_cell {
     public function get_num_words() {
         return str_word_count($this->raw_content);
     }
-
 }

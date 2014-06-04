@@ -39,7 +39,7 @@
 
         console.log("Creating Table");
 
-        Table = function(field_id) {
+        Table = function(field_id, factory) {
 
             var obj = $(this);
             var current_table = $('#table__table__'+field_id);
@@ -163,8 +163,7 @@
                                 if(!cell_inited) {
 
                                     var text_value = current_cell.data('init-cell-value');
-
-                                    var cell_content = $.getNewTextCellContent(field_id, row, col, text_value);
+                                    var cell_content = factory.getNewCellContent(rowtype, field_id, row, col, {text:text_value} );
                                     current_cell.attr('inited', 1);
                                     current_cell.data('inited', 1);
                                     current_cell.html(cell_content);
@@ -181,7 +180,7 @@
 
                                     var init_cell_value = current_cell.data('init-cell-value');
 
-                                    var title_image_cell_content = $.getNewTitleImageCellContent(field_id, row, col, init_cell_value.assets_file_id, init_cell_value.title_text);
+                                    var title_image_cell_content = factory.getNewCellContent(rowtype, field_id, row, col, init_cell_value);
                                     current_cell.attr('inited', 1);
                                     current_cell.data('inited', 1);
                                     current_cell.html(title_image_cell_content);
@@ -404,14 +403,8 @@
                 for(var i=0; i < num_cols; i++ ) {
                     var new_col_num = i+1;
                     var cell_content = '';
-                    switch(row_type) {
-                        case 'title_image':
-                            cell_content = $.getNewTitleImageCellContent(new_row_num, new_col_num);
-                            break;
-                        case 'text':
-                            cell_content = $.getNewTextCellContent(new_row_num, new_col_num);
-                            break;
-                    }
+
+                    cell_content = factory.getNewCellContent(row_type, field_id, new_row_num, new_col_num);
 
                     current_table.append(
                         '<div style="top:'+new_row_position+'px; left:'+(i*cell_width)+'px" class="table__cell transitions" data-row-type="'+row_type+'" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
@@ -553,7 +546,7 @@
                         if(files.length > 0) {
                             add_image_controls_div.hide();
                             var file_id = files[0].id;
-                            var img_tag = $.getAssetsImgThumb(file_id);
+                            var img_tag = factory.getAssetsImgThumb(file_id);
                             thumb_image_div.html(img_tag);
                             remove_image_controls_div.fadeIn();
                         }
@@ -599,15 +592,8 @@
 
                     // find the row type based on the first column
                     var row_type = $('#table__table__'+field_id+' .table__cell[data-row="'+new_row_num+'"][data-col=1]').data('row-type');
-                    var cell_content = '';
-                    switch(row_type) {
-                        case 'title_image':
-                            cell_content = $.getNewTitleImageCellContent(field_id, new_row_num, new_col_num);
-                            break;
-                        case 'text':
-                            cell_content = $.getNewTextCellContent(field_id, new_row_num, new_col_num);
-                            break;
-                    }
+                    var cell_content = factory.getNewCellContent(row_type, field_id, new_row_num, new_col_num);
+
                     current_table.append(
                         '<div style="top:'+(i*cell_height)+'px; left:'+new_col_position+'px" class="table__cell transitions" data-row-type="'+row_type+'" data-row="'+new_row_num+'" data-col="'+new_col_num+'">'+cell_content+'</div>'
                     );
