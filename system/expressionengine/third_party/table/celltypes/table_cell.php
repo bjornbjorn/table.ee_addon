@@ -30,6 +30,11 @@ class Table_cell {
     protected $field_id;
 
     /**
+     * @var bool if TRUE this celltype cannot be unselected in the field options
+     */
+    public static $REQUIRED = FALSE;
+
+    /**
      * @var string the cell type
      */
     public static $TYPE = FALSE;

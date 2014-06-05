@@ -3,24 +3,36 @@
 <a href="#" class="table__table__add-row" data-field_id="<?php echo $field_id?>">
     <i class="icon-plus-sign-alt"></i> Add row
 </a>
+<?php
+$available_celltypes = $settings['available_celltypes'];
+if($available_celltypes) {  // if we have more celltypes available than just 'Text', add dropdown
+?>
 
 <div style="position:relative; float:left;">
     <div class="table__table__add-row-dropdown" data-field_id="<?php echo $field_id?>">
 
         <ul class="table__table__row-types">
             <?php
+
             foreach($celltypes as $celltype) {
+
+                if($celltype::$REQUIRED || $available_celltypes && in_array($celltype::$TYPE, $available_celltypes)) {
                 ?><li>
                 <a href="#" class="table__table__add-row" data-celltype="<?php echo $celltype::$TYPE?>">
                     <i class="<?php echo $celltype::$ICON_CSS_CLASS?>"></i> <?php echo $celltype::$TYPE_HUMAN ?>
                 </a>
             </li><?php
+                }
             }   // eof foreach celltypes
             ?>
         </ul>
     </div>
 
 </div>
+
+<?php
+}   // if(available_celltypes)
+?>
 
 
 <a href="#" class="table__table__add-col" data-field_id="<?php echo $field_id?>">

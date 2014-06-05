@@ -15,6 +15,8 @@ class Table_text_cell extends Table_cell {
 
     public static $ICON_CSS_CLASS = 'icon-align-left';
 
+    public static $REQUIRED = TRUE;
+
     /**
      * Get number of characters in text content
      *

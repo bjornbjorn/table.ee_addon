@@ -436,11 +436,21 @@
 
                 var dropdown = $('.table__table__add-row-dropdown[data-field_id='+field_id+']');
 
-                if(dropdown.is(':visible')) {
-                    dropdown.hide();
+                /**
+                 * If dropdown hasn't been output for this Add row button, then we only have the
+                 * 'Text' celltype available. If so, just add a new text row immediately.
+                 */
+                if(dropdown.length == 0) {
+                    obj.addNewTableRow('text');
                 } else {
-                    dropdown.show();
+                    if(dropdown.is(':visible')) {
+                        dropdown.hide();
+                    } else {
+                        dropdown.show();
+                    }
                 }
+
+
             });
 
             /**

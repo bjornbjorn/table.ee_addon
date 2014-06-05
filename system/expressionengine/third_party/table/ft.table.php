@@ -54,6 +54,7 @@ class Table_ft extends EE_Fieldtype {
             'table_num_rows' => 0,
             'table_num_cols' => 0,
             'celltypes' => ee()->table_lib->get_celltypes(),
+            'settings' => $this->settings,
         );
 
         $field_id = $this->field_id;
@@ -178,7 +179,7 @@ class Table_ft extends EE_Fieldtype {
      *
      * @return string|void
      */
-   /* public function display_settings($data)
+    public function display_settings($data)
     {
         ee()->load->library('table_lib');
 
@@ -188,27 +189,35 @@ class Table_ft extends EE_Fieldtype {
         ));
 
         $celltypes = ee()->table_lib->get_celltypes();
+        $celltype_checkboxes_html = '';
         foreach($celltypes as $celltype) {
-            // Minimum rows field
-            ee()->table->add_row(
-                form_checkbox(array(
+
+                $checkbox_config = array(
                     'name' => 'available_celltypes[]',
                     'value' => $celltype::$TYPE,
-                    'checked' => isset($data['available_celltypes']) && is_array($data['available_celltypes']) && in_array($celltype::$TYPE, $data['available_celltypes'])
-                    //'class' => 'grid_input_text_small'
-                )).
-                '<div class="grid_input_label_group">'.
-                form_label($celltype::$TYPE_HUMAN, $celltype::$TYPE).
-                '<br><i class="instruction_text">'.lang('grid_min_rows_desc').'</i></div>'
+                    'checked' => $celltype::$REQUIRED || isset($data['available_celltypes']) && is_array($data['available_celltypes']) && in_array($celltype::$TYPE, $data['available_celltypes'])
+                );
 
-            );
+                if($celltype::$REQUIRED) {
+                    $checkbox_config['disabled'] = '';
+                }
+
+                $celltype_checkboxes_html .= '<div class="table__table__options-field">'.form_checkbox($checkbox_config)
+                .
+                '<span>'.form_label($celltype::$TYPE_HUMAN, $celltype::$TYPE).'</span></div>';
 
         }
 
+        ee()->table->add_row(
+            lang('table_options_select_available_fields'),
+            $celltype_checkboxes_html
+        );
 
-        return ee()->table->generate();
+        ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table_options.min.css">');
+
+        $html = ee()->table->generate();
+        return $html;
     }
-
 
     public function save_settings($data)
     {
@@ -217,8 +226,7 @@ class Table_ft extends EE_Fieldtype {
         return array(
             'available_celltypes' => $available_celltypes,
         );
-    }*/
-
+    }
 
     public function post_save_settings($data)
     {
