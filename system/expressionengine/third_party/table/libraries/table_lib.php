@@ -6,6 +6,10 @@ class Table_lib {
     protected $js_factories;
     protected $celltypes;
 
+    public function __construct() {
+        $this->load_cells();
+    }
+
     /**
      * Load all available cells in celltypes directory
      */

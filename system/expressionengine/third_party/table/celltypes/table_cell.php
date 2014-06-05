@@ -69,7 +69,19 @@ class Table_cell {
      * @return string/HTML
      */
     public function get_cell_frontend_content() {
-        return $this->raw_content;
+        $raw_content = $this->raw_content;
+
+        /**
+         * This hook enables devs to modify the raw_content of the cell before it is handed off to the cells
+         * get_cell_frontend_content() method
+         */
+        if (ee()->extensions->active_hook('table_tablecell_get_frontend_content') === TRUE)
+        {
+            $raw_content = ee()->extensions->call('table_tablecell_get_frontend_content', $this::$TYPE, $this->field_id, $this->row, $this->col, $raw_content, $this);
+            if (ee()->extensions->end_script === TRUE) return;
+        }
+
+        return $raw_content;
     }
 
     /**

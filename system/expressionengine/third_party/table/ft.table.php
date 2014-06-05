@@ -47,7 +47,6 @@ class Table_ft extends EE_Fieldtype {
     public function display_field($data)
     {
         ee()->load->library('table_lib');
-        ee()->table_lib->load_cells();
 
         $vars = array(
             'field_id' => $this->field_id,
@@ -179,10 +178,9 @@ class Table_ft extends EE_Fieldtype {
      *
      * @return string|void
      */
-    public function display_settings($data)
+   /* public function display_settings($data)
     {
         ee()->load->library('table_lib');
-        ee()->table_lib->load_cells();
 
         ee()->table->set_heading(array(
             'data' => lang('table_options'),
@@ -200,9 +198,9 @@ class Table_ft extends EE_Fieldtype {
                     //'class' => 'grid_input_text_small'
                 )).
                 '<div class="grid_input_label_group">'.
-                form_label($celltype::$TYPE_HUMAN, 'grid_min_rows').
-                '<br><i class="instruction_text">'.lang('grid_min_rows_desc').'</i></div>'.
-                '<div class="grid_validation_error">'.form_error('grid_max_rows').'</div>'
+                form_label($celltype::$TYPE_HUMAN, $celltype::$TYPE).
+                '<br><i class="instruction_text">'.lang('grid_min_rows_desc').'</i></div>'
+
             );
 
         }
@@ -219,7 +217,7 @@ class Table_ft extends EE_Fieldtype {
         return array(
             'available_celltypes' => $available_celltypes,
         );
-    }
+    }*/
 
 
     public function post_save_settings($data)

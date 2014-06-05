@@ -427,22 +427,6 @@
             // add transitions class after we have positioned them
             setTimeout(obj.addTransitionsClass, 500);
 
-
-            /**
-             * Global click handler
-             */
-          /*  $(document).on('click', function(e) {
-        */
-                /**
-                 * If the add row dropdown is displaying hide it
-                 */
-          /*      if($('.table__table__add-row-dropdown').is(':visible')) {
-                    $('.table__table__add-row-dropdown').hide();
-                }
-            });
-
-        */
-
             /**
              * Add row button click handler
              */

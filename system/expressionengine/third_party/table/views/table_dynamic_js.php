@@ -5,6 +5,20 @@
      */
     if(!TableCellFactory) {
 
+
+        /**
+         * Global click handler
+         */
+        $(document).on('click', function(e) {
+
+            /**
+             * If the add row dropdown is displaying hide it
+             */
+            if($('.table__table__add-row-dropdown').is(':visible')) {
+                $('.table__table__add-row-dropdown').hide();
+            }
+        });
+
         var table_tab_index = 0;
 
 <?php

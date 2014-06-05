@@ -17,7 +17,8 @@ class Table_title_image_cell extends Table_cell {
 
     public function get_cell_frontend_content()
     {
-        $content_obj = json_decode($this->raw_content);
+        $raw_content = parent::get_cell_frontend_content();
+        $content_obj = json_decode($raw_content);
         $content_html = isset($content_obj->title_text) ? '<h2 title="'.$content_obj->title_text.'">'.$content_obj->title_text.'</h2>' : '';
         if(isset($content_obj->assets_file_id)) {
             ee()->load->add_package_path(PATH_THIRD.'assets/');
