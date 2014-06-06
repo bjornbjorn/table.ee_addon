@@ -55,6 +55,7 @@ class Table_ft extends EE_Fieldtype {
             'table_num_cols' => 0,
             'celltypes' => ee()->table_lib->get_celltypes(),
             'settings' => $this->settings,
+            'use_assets' => FALSE,      // Use Assets for file handling?
         );
 
         $field_id = $this->field_id;
@@ -133,9 +134,9 @@ class Table_ft extends EE_Fieldtype {
         if (array_key_exists('assets', $this->EE->addons->get_installed()))
         {
             require_once PATH_THIRD.'assets/helper.php';
-
             $assets_helper = new Assets_helper;
             $assets_helper->include_sheet_resources();
+            //$vars['use_assets'] = TRUE;   @todo enable this
         }
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
@@ -143,6 +144,7 @@ class Table_ft extends EE_Fieldtype {
         $dynamic_js_vars = array(
             'field_id' => $field_id,
             'factories' => ee()->table_lib->get_js_cell_factories(),
+            'use_assets' => $vars['use_assets'],
         );
 
         $dynamic_js = ee()->load->view('table_dynamic_js', $dynamic_js_vars, TRUE);

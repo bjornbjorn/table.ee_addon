@@ -37,7 +37,16 @@
 
     (function($){
 
-        Table = function(field_id, table_tab_index, factory) {
+        /**
+         * Create a new Table
+         *
+         * @param field_id the field id of the field this table belongs to
+         * @param table_tab_index the tables tab index start offset
+         * @param factory TableCreator factory
+         * @param use_assets use Assets for file handling?
+         * @constructor
+         */
+        Table = function(field_id, table_tab_index, factory, use_assets) {
 
             var obj = $(this);
             var current_table = $('#table__table__'+field_id);
@@ -471,27 +480,36 @@
                 var add_image_controls_div = $(this).parent();
                 var thumb_image_div = add_image_controls_div.parent().find('.table__table__cell-thumbnail');
                 var remove_image_controls_div = add_image_controls_div.parent().find('.table__table__cell-remove-image-controls');
-                var assets_sheet = new Assets.Sheet({
 
-                    // optional settings (these are the default values):
-                    multiSelect: false,
-                    filedirs:    'all', // or array of filedir IDs
-                    kinds:       ['image'], // or array of file kinds ("image", "flash", etc)
+                /**
+                 * If we've opted to use Assets for file handling set it up and show the Assets Sheet
+                 */
+                if(use_assets) {
 
-                    // onSelect callback (required):
-                    onSelect:    function(files) {
+                    var assets_sheet = new Assets.Sheet({
 
-                        if(files.length > 0) {
-                            add_image_controls_div.hide();
-                            var file_id = files[0].id;
-                            var img_tag = factory.getAssetsImgThumb(file_id);
-                            thumb_image_div.html(img_tag);
-                            remove_image_controls_div.fadeIn();
+                        // optional settings (these are the default values):
+                        multiSelect: false,
+                        filedirs:    'all', // or array of filedir IDs
+                        kinds:       ['image'], // or array of file kinds ("image", "flash", etc)
+
+                        // onSelect callback (required):
+                        onSelect:    function(files) {
+
+                            if(files.length > 0) {
+                                add_image_controls_div.hide();
+                                var file_id = files[0].id;
+                                var img_tag = factory.getAssetsImgThumb(file_id);
+                                thumb_image_div.html(img_tag);
+                                remove_image_controls_div.fadeIn();
+                            }
                         }
-                    }
-                });
+                    });
 
-                assets_sheet.show();
+                    assets_sheet.show();
+                } else {
+                    $.ee_notice("Igor, set up program five!");
+                }
             });
 
 
@@ -513,8 +531,23 @@
             $('.table__table__add-col[data-field_id='+field_id+']').on('click', function(e) {
                 e.preventDefault();
 
+                /**
+                 * If we have no rows, check if we have multiple row types. If so the user needs to
+                 * add a row before adding a col, if not we can just add a text row.
+                 */
                 if(num_rows === 0) {
-                    alert("Add a row first");
+                    var dropdown = $('.table__table__add-row-dropdown[data-field_id='+field_id+']');
+
+                    /**
+                     * If dropdown hasn't been output for this Add row button, then we only have the
+                     * 'Text' celltype available. If so, just add a new text row immediately.
+                     */
+                    if(dropdown.length > 0) {
+                        $.ee_notice('Please add a row first.',{open:true});
+                    } else {
+                        obj.addNewTableRow('text');
+                    }
+
                     return;
                 }
 

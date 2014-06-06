@@ -5,7 +5,6 @@
      */
     if(!TableCellFactory) {
 
-
         /**
          * Global click handler
          */
@@ -63,6 +62,6 @@ foreach($factories as $factory) {
     $(document).ready(
         function(e) {
             table_tab_index++;
-            var table__table__<?php echo $field_id?> = new Table(<?php echo $field_id?>, table_tab_index, TableCellFactory);}
+            var table__table__<?php echo $field_id?> = new Table(<?php echo $field_id?>, table_tab_index, TableCellFactory, <?php echo $use_assets?'true':'false'?>);}
     );
 </script>
