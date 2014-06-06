@@ -23,11 +23,10 @@ class Table_ft extends EE_Fieldtype {
     }
 
     /**
-     * Make Grid compatible.
+     * Make Grid compatible. // removed for now
      *
      * @param $name
      * @return bool
-     */
     public function accepts_content_type($name)
     {
         return ($name == 'channel' || $name == 'grid');
@@ -37,6 +36,7 @@ class Table_ft extends EE_Fieldtype {
     {
         return $this->display_field($data);
     }
+*/
 
     /**
      * Display the field
@@ -76,8 +76,9 @@ class Table_ft extends EE_Fieldtype {
             $table_rows = array();
             for($j=1; $j <= count($table_post_data); $j++) {
 
-                // right now each cell has the type, but we only care about row type for now...
-                $row_type = isset($table_post_data[$j][1]['title_image']) ? 'title_image' : 'text';       // @todo fix this when we have more row types
+                $first_cell = $table_post_data[$j][1];
+                reset($first_cell);
+                $row_type = key($first_cell);
 
                 $row_data = array(
                     'entry_id' => $entry_id,
@@ -122,6 +123,7 @@ class Table_ft extends EE_Fieldtype {
                 }
 
                 $vars['table_rows'] = $table_rows;
+
                 $vars['table_num_rows'] = $table_num_rows;
                 $vars['table_num_cols'] = $table_num_cols;
             }
@@ -204,7 +206,7 @@ class Table_ft extends EE_Fieldtype {
 
                 $celltype_checkboxes_html .= '<div class="table__table__options-field">'.form_checkbox($checkbox_config)
                 .
-                '<span>'.form_label($celltype::$TYPE_HUMAN, $celltype::$TYPE).'</span></div>';
+                '<span>'.form_label($celltype::$TYPE_HUMAN . ($celltype::$REQUIRED ? ' (Required)':'') , $celltype::$TYPE).'</span></div>';
 
         }
 
@@ -219,9 +221,28 @@ class Table_ft extends EE_Fieldtype {
         return $html;
     }
 
+    // Only called when being rendered in a Grid field cell:
+    /*public function grid_display_settings($data)
+    {
+        return array($this->display_settings($data));
+    }*/
+
     public function save_settings($data)
     {
-        $available_celltypes = ee()->input->post('available_celltypes');
+        if(isset($this->settings['col_id'])) {
+            $col_id = $this->settings['col_id'];
+
+            $grid_post = ee()->input->post('grid');
+            $grid_col = $grid_post['cols']['col_id_'.$col_id];
+
+            if(isset($grid_col['col_settings'])) {
+                if(isset($grid_col['col_settings']['available_celltypes'])) {
+                    $available_celltypes = $grid_col['col_settings']['available_celltypes'];
+                }
+            }
+        } else {
+            $available_celltypes = ee()->input->post('available_celltypes');
+        }
 
         return array(
             'available_celltypes' => $available_celltypes,
@@ -358,8 +379,9 @@ class Table_ft extends EE_Fieldtype {
 
                 for($j=1; $j <= count($table_data); $j++) {
 
-                    // right now each cell has the type, but we only care about row type for now...
-                    $row_type = isset($table_data[$j][1]['title_image']) ? 'title_image' : 'text';       // @todo fix this when we have more row types
+                    $first_cell = $table_data[$j][1];
+                    reset($first_cell);
+                    $row_type = key($first_cell);
 
                     $insert_data = array(
                         'entry_id' => $entry_id,

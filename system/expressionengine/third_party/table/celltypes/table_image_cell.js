@@ -1,4 +1,4 @@
-var factory_title_image_cell = {
+var factory_image_cell = {
 
     /**
      * Get HTML for a title image cell
@@ -13,7 +13,7 @@ var factory_title_image_cell = {
             value_obj = {};
         }
 
-        var html = '<input type="hidden"><input type="text" value="'+(value_obj.title_text !== undefined ? value_obj.title_text : '')+'">';
+        html = '<input type="hidden">';
 
         if(value_obj.assets_file_id === undefined) {
             html += '<div class="table__table__cell-add-image-controls"><a href="#" class="table__table__cell__add-image-button" data-field_id="'+field_id+'">Add file</a></div><div class="table__table__cell-remove-image-controls" style="display:none"><div class="table__table__cell-thumbnail"></div><a href="#" class="table__table__cell__remove-image-button" data-field_id="'+field_id+'">Remove file</a></div>';
@@ -47,14 +47,18 @@ var factory_title_image_cell = {
         var hidden_input = cell_ref.find('input[type=hidden]');
         hidden_input.attr('name', element_name);
 
-        var text_input = cell_ref.find('input[type=text]');
-        text_input.attr('tabindex', tabindex);
-
-        // update the value of the hidden with the current values of the content
+        // current selected assets file
         var assets_file_id = cell_ref.find('img').data('assets_file_id');
-        var title_text = text_input.val();
 
-        hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id, title_text: title_text} ));
+
+            var add_image_button = cell_ref.find('.table__table__cell__add-image-button');
+            add_image_button.attr('tabindex', tabindex);
+
+            var remove_image_button = cell_ref.find('.table__table__cell__remove-image-button');
+            remove_image_button.attr('tabindex', tabindex);
+
+
+        hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id} ));
     }
 
 };

@@ -430,7 +430,7 @@
             /**
              * Add row button click handler
              */
-            $('.table__table__add-row[data-field_id='+field_id+']').on('click', function(e) {
+            $(document).on('click', '.table__table__add-row[data-field_id='+field_id+']', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -440,7 +440,7 @@
                  * If dropdown hasn't been output for this Add row button, then we only have the
                  * 'Text' celltype available. If so, just add a new text row immediately.
                  */
-                if(dropdown.length == 0) {
+                if(dropdown.length === 0) {
                     obj.addNewTableRow('text');
                 } else {
                     if(dropdown.is(':visible')) {
@@ -449,8 +449,6 @@
                         dropdown.show();
                     }
                 }
-
-
             });
 
             /**

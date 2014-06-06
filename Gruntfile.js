@@ -54,7 +54,7 @@ module.exports = function(grunt) {
                 atBegin: true
             },
             css: {
-                files: 'system/expressionengine/third_party/table/sass/*/**.scss',
+                files: 'system/expressionengine/third_party/table/sass/**/*.scss',
                 tasks: ['sass']
             },
             scripts: {

@@ -3,12 +3,15 @@
 @import "mixins";
 @import "celltypes/text";
 @import "celltypes/title_image";
+@import "celltypes/image";
+
 
 /* apply a natural box layout model to all elements */
-/**, *:before, *:after {
-  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+.table__table__outer-container {
+  *, *:before, *:after {
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+  }
 }
-*/
 
 
 /**
@@ -31,7 +34,6 @@ a.table__table__add-col
   left: 10px;
   background-color: #d0d9e1;
   width: 200px;
-  height: 80px;
   @include arrow(top, 'left', #d0d9e1);
   z-index: 9999;
   padding: 10px;
