@@ -3,9 +3,8 @@
 require_once 'table_cell.php';
 
 /**
- * Title / Image cell
+ * Image cell
  */
-
 
 class Table_image_cell extends Table_cell {
 
@@ -15,12 +14,14 @@ class Table_image_cell extends Table_cell {
 
     public static $ICON_CSS_CLASS = 'icon-picture';
 
-    public function get_cell_frontend_content()
+    public function replace_tag($tagdata = '', $params = '')
     {
-        $raw_content = parent::get_cell_frontend_content();
-        $content_obj = json_decode($raw_content);
+        if($tagdata == '') {
+            return '';
+        }
 
-        $content_html = '';
+        $raw_content = parent::replace_tag($tagdata, $params);
+        $content_obj = json_decode($raw_content);
 
         if(isset($content_obj->assets_file_id)) {
             ee()->load->add_package_path(PATH_THIRD.'assets/');
@@ -29,10 +30,9 @@ class Table_image_cell extends Table_cell {
             ee()->load->library('Assets_lib');
             $assets_file = ee()->assets_lib->get_file_by_id($content_obj->assets_file_id);
             $assets_helper = new Assets_helper();
-
-            //$content_html .= $assets_helper->parse_file_tag(array($assets_file), $tagdata);
+            $tagdata = $assets_helper->parse_file_tag(array($assets_file), $tagdata);
         }
-        return $content_html;
+        return $tagdata;
     }
 
 }

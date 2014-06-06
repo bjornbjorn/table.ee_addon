@@ -18,6 +18,19 @@ class Table_text_cell extends Table_cell {
     public static $REQUIRED = TRUE;
 
     /**
+     * Get parsed content for this cell
+     *
+     * @return string/HTML
+     */
+    public function replace_tag($tagdata = '', $params = '') {
+        $raw_content = $this->raw_content;
+        $html = str_replace('{content}', $raw_content, $tagdata);
+
+        return $html;
+    }
+
+
+    /**
      * Get number of characters in text content
      *
      * @return int

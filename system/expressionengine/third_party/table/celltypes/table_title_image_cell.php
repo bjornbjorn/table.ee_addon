@@ -15,11 +15,19 @@ class Table_title_image_cell extends Table_cell {
 
     public static $ICON_CSS_CLASS = 'icon-picture';
 
-    public function get_cell_frontend_content()
+    public function replace_tag($tagdata = '', $params = '')
     {
-        $raw_content = parent::get_cell_frontend_content();
+        if($tagdata == '') {
+            return $tagdata;
+        }
+
+        $raw_content = parent::replace_tag($tagdata, $params);
         $content_obj = json_decode($raw_content);
-        $content_html = isset($content_obj->title_text) ? '<h2 title="'.$content_obj->title_text.'">'.$content_obj->title_text.'</h2>' : '';
+
+        if(isset($content_obj->title_text)) {
+            $tagdata =  str_replace('{title_text}', $content_obj->title_text, $tagdata);
+        }
+
         if(isset($content_obj->assets_file_id)) {
             ee()->load->add_package_path(PATH_THIRD.'assets/');
             require_once PATH_THIRD.'assets/sources/ee/file.ee.php';
@@ -27,15 +35,10 @@ class Table_title_image_cell extends Table_cell {
             ee()->load->library('Assets_lib');
             $assets_file = ee()->assets_lib->get_file_by_id($content_obj->assets_file_id);
             $assets_helper = new Assets_helper();
-
-            $force_width = 139;
-            $width_ratio = $assets_file->width() / $force_width;
-            $force_height = round($assets_file->height() / $width_ratio);
-
-            $tagdata = '<img width="'.$force_width.'" height="'.$force_height.'" title="'.$content_obj->title_text.'" src="{url}"/>';
-            $content_html .= $assets_helper->parse_file_tag(array($assets_file), $tagdata);
+            $tagdata = $assets_helper->parse_file_tag(array($assets_file), $tagdata);
         }
-        return $content_html;
+
+        return $tagdata;
     }
 
 }

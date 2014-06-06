@@ -73,17 +73,17 @@ class Table_cell {
      *
      * @return string/HTML
      */
-    public function get_cell_frontend_content() {
+    public function replace_tag($tagdata = '', $params = '') {
         $raw_content = $this->raw_content;
 
         /**
          * This hook enables devs to modify the raw_content of the cell before it is handed off to the cells
-         * get_cell_frontend_content() method
+         * replace_tag() method
          */
-        if (ee()->extensions->active_hook('table_tablecell_get_frontend_content') === TRUE)
+        if (ee()->extensions->active_hook('table_tablecell_replace_tag') === TRUE)
         {
-            $raw_content = ee()->extensions->call('table_tablecell_get_frontend_content', $this::$TYPE, $this->field_id, $this->row, $this->col, $raw_content, $this);
-            if (ee()->extensions->end_script === TRUE) return;
+            $raw_content = ee()->extensions->call('table_tablecell_replace_tag', $this::$TYPE, $this->field_id, $this->row, $this->col, $raw_content, $tagdata, $params, $this);
+            if (ee()->extensions->end_script === TRUE) return $raw_content;
         }
 
         return $raw_content;

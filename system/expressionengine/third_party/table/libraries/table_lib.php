@@ -107,6 +107,7 @@ class Table_lib {
         $row_offset = isset($params['row_offset']) ? $params['row_offset'] : FALSE;
         $col_limit = isset($params['col_limit']) ? $params['col_limit'] : FALSE;
         $col_offset = isset($params['col_offset']) ? ($params['col_offset'] + 1) : 1;
+        $orderby = isset($params['orderby']) ? $params['orderby'] : FALSE;
 
         $table_name = Table_ft::TABLE_PREFIX.$field_name;
         $num_cols = 0;
@@ -124,7 +125,16 @@ class Table_lib {
         if($q->num_rows() > 0) {
 
             $rows = array();
-            foreach($q->result_array() as $row) {
+
+            $tagdata = ee()->TMPL->parse_switch($tagdata, $row_num);
+
+            $row_arr = $q->result_array();
+            if($orderby == 'random')
+            {
+                shuffle($entry_data);
+            }
+
+            foreach($row_arr as $row) {
                 $row_num++;
                 $row_type = $row['row_type'];
                 $col = array();
@@ -137,10 +147,17 @@ class Table_lib {
                     $celltype_class = 'Table_'.$row['row_type'].'_cell';
                     $cell = new $celltype_class($row_num, $field_id, $col_counter, $raw_content);
 
+
                     $col[] =
                         array(
                             Table_ft::TAG_PREFIX.'col:num' => $cell->col,
-                            Table_ft::TAG_PREFIX.'col:content' => $cell->get_cell_frontend_content(),
+                            /*Table_ft::TAG_PREFIX.'col:content' => array(
+                                array(
+                                    'html' => $cell->get_cell_frontend_content(),
+                                    'celltype' => $row_type,
+
+                                )
+                            ),*/
                             Table_ft::TAG_PREFIX.'col:content_raw' => $cell->raw_content,
                             Table_ft::TAG_PREFIX.'col:content:num_words' => $cell->get_num_words(),
                             Table_ft::TAG_PREFIX.'col:content:num_chars' => $cell->get_num_chars()
@@ -182,13 +199,98 @@ class Table_lib {
             $vars = array(
                 Table_ft::TAG_PREFIX.'total_rows' => count($rows),
                 Table_ft::TAG_PREFIX.'total_cols' => $num_cols,
-                Table_ft::TAG_PREFIX.'rows' => $rows,
+                Table_ft::TAG_PREFIX.'row' => $rows,
                 Table_ft::TAG_PREFIX.'mobile:tables' => $mobile_tables
             );
 
-            $tagdata = ee()->TMPL->parse_variables($tagdata, array($vars));
+            $row_pattern = '{'.Table_ft::TAG_PREFIX.'row}(.*?){\/'.Table_ft::TAG_PREFIX.'row}';
+
+            preg_match_all('/'.$row_pattern.'/msU', $tagdata, $matches);
+            if($matches && count($matches[0]) > 0) {
+
+                $row_tagchunk = $matches[1][0];
+
+                $tagdata = str_replace($row_tagchunk, '#table__table__col#', $tagdata );
+
+                $tagdata = ee()->TMPL->parse_variables($tagdata, array($vars));
+
+                $row_num=0;
+                foreach($row_arr as $row) {
+                    $row_num++;
+                    $pos = strpos($tagdata, '#table__table__col#');
+                    if ($pos !== false) {
+                        $i=$col_offset;
+                        $col_counter = 0;
+                        $all_cols_data = '';
+
+                        while(isset($row['col_'.$i]) && ($col_limit == FALSE || $col_counter < $col_limit)) {
+                            $col_counter++;
+                            $raw_content = $row['col_'.$i];
+
+                            $celltype_class = 'Table_'.$row['row_type'].'_cell';
+                            $cell = new $celltype_class($row_num, $field_id, $col_counter, $raw_content);
+
+                            $col_pattern = '{'.Table_ft::TAG_PREFIX.'col}(.*?){\/'.Table_ft::TAG_PREFIX.'col}';
+                            preg_match('/'.$col_pattern.'/msU', $row_tagchunk, $col_matches);
+                            if($col_matches) {
+
+                                /**
+                                 * Parse celltype tag pairs like {table:image}
+                                 */
+                                $content_pattern = '{'.Table_ft::TAG_PREFIX.$row['row_type'].'}(.*?){\/'.Table_ft::TAG_PREFIX.$row['row_type'].'}';
+
+                                preg_match('/'.$content_pattern.'/msU', $col_matches[1], $content_matches);
+                                if($content_matches) {
+
+                                    // replace tags with the content for the current cell type (cell->replace_tag)
+                                    $col_content = str_replace($content_matches[0], $cell->replace_tag($content_matches[1]), $col_matches[1]);
+
+                                    // clear any unparsed celltype tags
+                                    $col_content = preg_replace('/{(.*)}(.*)?{\/(.*)}/msU', '', $col_content);
+                                    $all_cols_data .= $col_content;
+
+
+                                } else {
+                                    $all_cols_data .= '';
+                                }
+                            }
+
+                            $i++;
+                        }
+
+                        $row_tagdata_full = str_replace($col_matches[0], $all_cols_data, $row_tagchunk);
+
+                        $tagdata = substr_replace($tagdata, $row_tagdata_full, $pos, strlen('#table__table__col#'));
+                    }
+                }
+            }
+
+
+/*
+            $col_content_pattern = '#{table:rows}(.*?){table:col:content}(.*?){/table:col:content}(.*?){/table:rows}#mi';
+            preg_match_all($col_content_pattern, $tagdata, $matches);
+
+            var_dump($matches);die();
+
+            for($row_counter=0; $row_counter < count($matches[0]); $row_counter++) {
+               $col_content_match = $matches[0][$row_counter];
+                $col_content_tagchunk = $matches[1][$row_counter];
+
+                var_dump($row_arr);
+                $row_type = $row_arr[$row_counter]['row_type'];
+                $col_content_tagchunk .= $row_type;
+                $tagdata = preg_replace($col_content_pattern, $col_content_tagchunk, $tagdata, 1);
+            }
+
+
+*/
+
+
+
 
         }
+
+
 
         return $tagdata;
     }

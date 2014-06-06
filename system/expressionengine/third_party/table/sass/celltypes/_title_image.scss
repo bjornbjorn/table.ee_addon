@@ -18,11 +18,13 @@
 
   .table__table__cell-add-image-controls {
     width:100%;
+    height: 100%;
     text-align:center;
   }
 
   .table__table__cell__add-image-button, .table__table__cell__remove-image-button {
     @include button();
+    @include vertical-align(25);
   }
 
   .table__table__cell-remove-image-controls {
