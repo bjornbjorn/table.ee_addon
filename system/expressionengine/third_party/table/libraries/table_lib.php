@@ -134,17 +134,8 @@ class Table_lib {
                     $col_counter++;
                     $raw_content = $row['col_'.$i];
 
-                    $cell = FALSE;
-                    switch($row_type) {
-                        case Table_text_cell::$TYPE:
-                                $cell = new Table_text_cell($row_num, $field_id, $col_counter, $raw_content);
-                            break;
-
-                        case Table_title_image_cell::$TYPE:
-                                $cell = new Table_title_image_cell($row_num, $field_id, $col_counter, $raw_content);
-                            break;
-
-                    }
+                    $celltype_class = 'Table_'.$row['row_type'].'_cell';
+                    $cell = new $celltype_class($row_num, $field_id, $col_counter, $raw_content);
 
                     $col[] =
                         array(
