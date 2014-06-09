@@ -36,6 +36,14 @@ class Table_title_image_cell extends Table_cell {
             $assets_file = ee()->assets_lib->get_file_by_id($content_obj->assets_file_id);
             $assets_helper = new Assets_helper();
             $tagdata = $assets_helper->parse_file_tag(array($assets_file), $tagdata);
+        } else if(isset($content_obj->file_id)) {
+
+            require_once APPPATH.'fieldtypes/file/ft.file.php';
+            $ee_file = new File_ft();
+            $file_info = ee()->file_field->parse_field($content_obj->file_id);
+            if($file_info) {
+                $tagdata = $ee_file->replace_tag($file_info, $params, $tagdata);
+            }
         }
 
         return $tagdata;
