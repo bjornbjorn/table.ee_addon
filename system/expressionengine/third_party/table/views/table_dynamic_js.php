@@ -54,7 +54,24 @@ foreach($factories as $factory) {
             getAssetsImgThumb: function(file_id) {
                 var thumb_url = Assets.siteUrl + '?ACT=' + Assets.actions.view_thumbnail+'&file_id='+file_id+'&size=100x100&hash='+Math.random();
                 return '<img data-assets_file_id="'+file_id+'" src="'+thumb_url+'"/>';
+            },
+
+
+            getFileImgThumb: function(file_id) {
+                var request_url = "<?php echo ee()->config->item('cp_url')?>?S=0&D=cp&C=content_publish&M=filemanager_actions&file_id="+file_id+"&action=file_info&_="+Math.random();
+                $.getJSON(request_url, function(data) {
+
+                    console.log("setting src to " + data.thumb);
+
+                    console.log(data);
+                    $('img[data-file_id='+file_id+']').attr('src', data.thumb);
+
+                });
+
+                return '<img data-file_id="'+file_id+'"/>';
+
             }
+
         };
 
     }

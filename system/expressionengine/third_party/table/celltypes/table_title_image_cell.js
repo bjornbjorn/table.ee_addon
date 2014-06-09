@@ -51,10 +51,18 @@ var factory_title_image_cell = {
         text_input.attr('tabindex', tabindex);
 
         // update the value of the hidden with the current values of the content
-        var assets_file_id = cell_ref.find('img').data('assets_file_id');
+        var img_tag = cell_ref.find('img');
+        var assets_file_id = img_tag.data('assets_file_id');
+        var ee_file_id = img_tag.data('file_id');
         var title_text = text_input.val();
 
-        hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id, title_text: title_text} ));
+        if(assets_file_id) {
+            hidden_input.val( JSON.stringify( {assets_file_id: assets_file_id, title_text: title_text} ));
+        } else if(ee_file_id) {
+            hidden_input.val( JSON.stringify( {file_id: ee_file_id, title_text: title_text} ));
+        } else {
+            hidden_input.val( JSON.stringify( {title_text: title_text} ));
+        }
     }
 
 };

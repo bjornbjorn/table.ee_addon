@@ -508,7 +508,34 @@
 
                     assets_sheet.show();
                 } else {
-                    $.ee_notice("Igor, set up program five!");
+
+                    /**
+                     * First time the button is clicked we attach an EE FileManger trigger to it and
+                     * simulate a second click.
+                     *
+                     */
+                    var has_ee_file_trigger = $(this).data('has_ee_file_trigger');
+                    if(!has_ee_file_trigger) {
+
+                        $.ee_filebrowser.add_trigger(
+                            $(this),
+                            'field_name_changeme',
+                            function(file, field_name, this_is_undefined) {
+
+                                add_image_controls_div.hide();
+                                var file_id = file.file_id;
+                                var img_tag = '<img data-file_id="'+file_id+'" src="'+file.thumb+'"/>';
+                                thumb_image_div.html(img_tag);
+                                remove_image_controls_div.fadeIn();
+
+                            }
+                        );
+
+                        $(this).click();
+
+                    }
+
+
                 }
             });
 
@@ -521,6 +548,7 @@
                 thumb_image_div.html('');
                 remove_image_controls_div.hide();
                 add_image_controls_div.fadeIn();
+                obj.updateTableCells();
 
             });
 
