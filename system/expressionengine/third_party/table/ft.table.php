@@ -136,7 +136,7 @@ class Table_ft extends EE_Fieldtype {
             require_once PATH_THIRD.'assets/helper.php';
             $assets_helper = new Assets_helper;
             $assets_helper->include_sheet_resources();
-            //$vars['use_assets'] = TRUE;   @todo enable this
+            $vars['use_assets'] = TRUE;
         }
 
         ee()->cp->add_to_head('<link rel="stylesheet" href="'.ee()->table_lib->get_theme_url().'css/table.min.css">');
@@ -262,7 +262,7 @@ class Table_ft extends EE_Fieldtype {
         /**
          * hack to flush the cache of table names or else we will get SQL when renaming a field. This might stop
          * working in future versions of EE if the data_cache array is made private. But ->cache_off() does not work
-         * so will have to do for now ..
+         * so this will have to do for now ..
          * @todo fix
          */
         ee()->db->data_cache = array();
