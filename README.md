@@ -84,6 +84,6 @@ Example table:
 
 ## Changelog
 
-* [CHANGELOG.md](/lastfriday/table.ee_addon/CHANGELOG.md)
+* [CHANGELOG.md](./CHANGELOG.md)
 
 
