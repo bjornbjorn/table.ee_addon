@@ -51,7 +51,7 @@ Example template for field named "page_table":
     {page_table}
         <table>
             {table:rows}
-            <tr class="kundeflater-row-{table:row:type}">
+            <tr class="row-{table:row:type}">
                 {table:col}
                 <td class="col{table:col:num}{if table:col:content:num_words > 1} col-left-align{/if}">{table:col:content}</td>
                 {/table:col}
